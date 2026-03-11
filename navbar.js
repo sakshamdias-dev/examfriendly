@@ -3,12 +3,19 @@ class ExamNavbar extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
     }
-
     connectedCallback() {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        if (savedTheme === 'dark') {
+        // 1. Check logic: Manual preference > System preference > Default light
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+        if (initialTheme === 'dark') {
             document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
         }
+
         this.render();
         this.setupEventListeners();
     }

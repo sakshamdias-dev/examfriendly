@@ -1,6 +1,16 @@
 <html class="scroll-smooth" lang="en">
 
 <head>
+    <script>
+        // Immediate check to prevent "White Flash"
+        (function() {
+            const saved = localStorage.getItem('theme');
+            const system = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (saved === 'dark' || (!saved && system)) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
     <link rel="icon" type="image/x-icon" href="favicon.png">
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -136,13 +146,6 @@
         .testimonial-card:hover {
             transform: scale(1.02);
         }
-        #mobile-menu-checkbox:checked ~ #mobile-menu {
-            transform: translateX(0);
-        }
-        #mobile-menu-checkbox:checked ~ #mobile-menu-overlay {
-            opacity: 1;
-            pointer-events: auto;
-        }
         html, body {
   /* This stops the "rubber-band" bounce effect at the edges */
         overscroll-behavior-y: none; 
@@ -176,7 +179,7 @@
 </head>
 <header class="relative z-[100]">
     <exam-navbar></exam-navbar>
-    </header>
+</header>
 <body class="font-display pt-24 bg-white text-slate-900 dark:bg-slate-950 dark:text-white antialiased overflow-x-hidden">
     <div class="fixed inset-0 pointer-events-none z-0">
         <div class="absolute top-20 left-[10%] w-4 h-4 bg-primary opacity-20 rounded-full animate-floating-slow"></div>

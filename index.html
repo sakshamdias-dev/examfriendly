@@ -1,0 +1,586 @@
+<html class="scroll-smooth" lang="en">
+
+<head>
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Examfriendly | Empowering the Next Generation Education</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="examBot.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="theme.js"></script>
+    <script src ="navbar.js"></script>
+   
+<style>
+    /* Custom Deep Sky Blue Pagination */
+:root { --deep-sky-blue: #00BFFF; }
+
+.testimonial-swiper {
+    padding-bottom: 50px !important;
+}
+
+/* THE FIX: Allow slides to have different heights based on content */
+.swiper-wrapper {
+    align-items: flex-start; /* Prevents cards from stretching to match the tallest one */
+}
+
+.swiper-slide {
+    height: auto !important; /* Overrides default Swiper behavior */
+}
+
+.testimonial-card {
+    height: auto !important; /* Card only grows as large as the text inside */
+    transition: transform 0.3s ease;
+}
+
+/* Styling for the Deep Sky Blue dots */
+.swiper-pagination-bullet-active {
+    background: var(--deep-sky-blue) !important;
+    width: 20px !important;
+    border-radius: 4px !important;
+}
+</style>
+
+    <style type="text/tailwindcss">
+        :root {
+            --deep-sky-blue: #00BFFF;
+            --brand-orange: #FF8C00;
+        }
+        @layer base {
+            .bg-deep-sky-blue { background-color: var(--deep-sky-blue); }
+            .text-deep-sky-blue { color: var(--deep-sky-blue); }
+            .bg-brand-orange { background-color: var(--brand-orange); }
+            .text-brand-orange { color: var(--brand-orange); }
+            .border-deep-sky-blue { border-color: var(--deep-sky-blue); }
+        }
+        @keyframes continuousWipe {
+            0% { transform: translateX(-150%); }
+            70% { transform: translateX(250%); }
+            100% { transform: translateX(250%); }
+        }
+        .navbar-wipe-v2 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 76%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 191, 255, 0.22), transparent);
+            z-index: -1;
+            animation: continuousWipe 13s linear infinite;
+            animation-delay: 3s;
+            filter: blur(14px);
+        }
+        @keyframes navLineGrow {
+            0% { transform: scaleX(0); }
+            100% { transform: scaleX(1); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes softFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes floatingSlow {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(15px, -15px); }
+            66% { transform: translate(-10px, 10px); }
+        }
+        .navbar-bottom-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--deep-sky-blue), transparent);
+            transform-origin: center;
+            animation: navLineGrow 2.5s ease-out forwards;
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 1s ease-out forwards;
+        }
+        .animate-soft-float {
+            animation: softFloat 4s ease-in-out infinite;
+        }
+        .animate-gradient-shift {
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+        }
+        .animate-floating-slow {
+            animation: floatingSlow 6s ease-in-out infinite;
+        }
+        .offer-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .offer-card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 40px -10px rgba(0, 191, 255, 0.3);
+            border-color: var(--deep-sky-blue);
+        }
+        .testimonial-card {
+            transition: all 0.3s ease;
+        }
+        .testimonial-card:hover {
+            transform: scale(1.02);
+        }
+        #mobile-menu-checkbox:checked ~ #mobile-menu {
+            transform: translateX(0);
+        }
+        #mobile-menu-checkbox:checked ~ #mobile-menu-overlay {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        html, body {
+  /* This stops the "rubber-band" bounce effect at the edges */
+        overscroll-behavior-y: none; 
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00BFFF",
+                        "accent": "#FF8C00",
+                        "background-light": "#FFFFFF",
+                        "background-dark": "#0A0F1C",
+                        "slate-950": "#020617",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<header class="relative z-[100]">
+    <exam-navbar></exam-navbar>
+    </header>
+<body class="font-display pt-24 bg-white text-slate-900 dark:bg-slate-950 dark:text-white antialiased overflow-x-hidden">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-20 left-[10%] w-4 h-4 bg-primary opacity-20 rounded-full animate-floating-slow"></div>
+        <div class="absolute top-40 right-[15%] w-3 h-3 bg-accent opacity-20 rounded-full animate-floating-slow"
+            style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-40 left-[5%] w-6 h-6 border-2 border-primary opacity-10 rounded-full animate-floating-slow"
+            style="animation-delay: 2s;"></div>
+        <div class="absolute top-[60%] right-[10%] w-4 h-4 border-2 border-accent opacity-10 rounded-full animate-floating-slow"
+            style="animation-delay: 1.5s;"></div>
+        <div class="absolute top-[80%] left-[20%] w-2 h-2 bg-primary opacity-30 rounded-full animate-floating-slow"
+            style="animation-delay: 0.5s;"></div>
+    </div>
+    
+    <examfriendly-man></examfriendly-man>
+    <main class="relative z-10">
+        <section
+            class="relative pt-12 pb-20 lg:pt-16 lg:pb-24 overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-300">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="lg:flex lg:items-center lg:gap-12">
+                    <div class="lg:w-1/2 text-center lg:text-left">
+                        <div class="animate-fade-in-up" style="animation-delay: 0.1s;">
+                            <span
+                                class="inline-block px-4 py-1.5 rounded-full bg-accent dark:bg-orange-600 text-white text-sm font-bold mb-6">
+                                Empowering Learning and Teaching
+                            </span>
+                            <h1
+                                class="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-[1.1] mb-6">
+                                Unlock Your Learning <span
+                                    class="text-accent dark:text-orange-400">Potential.</span>
+                            </h1>
+                        </div>
+                        <p class="text-base sm:text-lg text-slate-600 dark:text-slate-400 mb-8 sm:mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0 animate-fade-in-up"
+                            style="animation-delay: 0.3s;">
+                            Comprehensive CBSE K-12 tutorials, specialized teacher training modules, and creative
+                            non-academic courses—all designed to help you excel in the digital age.
+                        </p>
+                        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up"
+                            style="animation-delay: 0.5s;">
+                            <button onclick="window.location.href='studentsResource.html'"
+                                class="w-full sm:w-auto px-8 py-4 bg-primary text-white font-bold rounded-xl shadow-xl shadow-primary/25 hover:brightness-110 active:scale-95 transition-all">
+                                Start Learning
+                            </button>
+                            <button onclick="window.location.href='aboutus.html'"
+                                class="w-full sm:w-auto px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined">article_person</span> About Us 
+                            </button>
+                        </div>
+                        <div class="mt-8 flex items-center justify-center lg:justify-start gap-4 text-sm text-slate-500 dark:text-slate-400 animate-fade-in-up"
+                            style="animation-delay: 0.7s;">
+                            <div class="flex -space-x-2">
+                                <img alt="User avatar 1"
+                                    class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-950"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXO4VCANS4TZzIJ8WNiV5SfzIyLd2O_AWFnzaMZSnxWOk9d66G7iwYlmA8QgbdILpMdbbHD4nAj6k-m_zWHsmzjxk_DCOieQKVxJdtp883cNvz3AHx7R0tYzbSiRslLq6olQ_NQCxXlbi4BY6wT8I_ClK3KTSjEPClMm840zB-oOZuVQvYQsiOm-GqrwhxHrMmEvg0wySbWth3KywSCaeNYXlwyZJSz1Xgvfr3b6lU4gGci3oQmKeJjuOqs0aHXAubuLdfK6iLPeE" />
+                                <img alt="User avatar 2"
+                                    class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-950"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxkLzKFgrbEt-soZf9mvzp3WjAREaRVeo2EAxInb4ws-5C_2M6eI1A067FdYW3rux9ar_028RHJU719qn_V046qqyC29qm5mSY09upmBI6V-EvI8A_K3Q2wI42UXPzg8jG0QV5miB0DIm_ydzuCV-S06hOwuHZ7R-bBm6lRjN0iSMnpf9UG9ZDwzjPJHc6PWDaoyaGvXO-Aw64V2XQ2SknhdVQPfb90x1umDMcUnJuGQu6NxREcJPlSJZd5BrIgjXHShEI6kRoGRo" />
+                                <img alt="User avatar 3"
+                                    class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-950"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSkyG6pcR9k8n9Z9LEHV0vUEsryE134yIolr8oO1RLLq27-nLeQq38pA1is9__KwX-yi0uco05IFWVrFaFKsps5bY9IQl8jlMdlGpmKVxzVLSSb63HRJMnAcFsuM-DW0rcsiLNvE2YhxaurNrH92obZLC1wLn8qpdmfB4WfVFf3budNXOphTrTDVNQBP9VIhzD5YS-flZZ_p0wr_J_W1B0jpBrhetK-E1onqcWg7ruDeD2WtvNj8hVJ0Ewbz9vL-KV8SWlQeYAenE" />
+                            </div>
+                            <span>Trusted by many Students , Parents &amp; Teachers across India</span>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 mt-12 lg:mt-0 relative animate-soft-float">
+                        <div
+                            class="absolute -top-12 -right-12 w-48 h-48 sm:w-64 sm:h-64 bg-primary/10 rounded-full blur-3xl">
+                        </div>
+                        <div
+                            class="absolute -bottom-12 -left-12 w-48 h-48 sm:w-64 sm:h-64 bg-accent/10 rounded-full blur-3xl">
+                        </div>
+                        <div></div>
+                            
+                            <script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+</style>
+
+<div>
+  
+  <div class="relative w-full max-w-4xl animate-float group">
+    
+    <div class="relative rounded-t-2xl border-[8px] border-slate-800 bg-slate-800 p-2 shadow-2xl">
+      <div class="relative overflow-hidden rounded-lg bg-white aspect-video">
+        
+        <div id="slider" class="flex transition-transform duration-500 ease-out h-full">
+          <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover flex-shrink-0" alt="Slide 1">
+          <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover flex-shrink-0" alt="Slide 2">
+          <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover flex-shrink-0" alt="Slide 3">
+          <img src="https://images.unsplash.com/photo-1587620962725-abab7fe55159?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover flex-shrink-0" alt="Slide 4">
+          <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover flex-shrink-0" alt="Slide 5">
+        </div>
+
+        <div class="absolute inset-0 flex items-center justify-between p-4">
+          <button onclick="prevSlide()" class="p-2 rounded-full bg-orange-500 hover:bg-orange-600 text-white shadow-lg transition-all transform hover:scale-110 active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button onclick="nextSlide()" class="p-2 rounded-full bg-orange-500 hover:bg-orange-600 text-white shadow-lg transition-all transform hover:scale-110 active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div class="bg-slate-700 h-4 w-[110%] -ml-[5%] rounded-b-xl shadow-xl border-t border-slate-600"></div>
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-2 bg-[#00bfff] rounded-b-lg shadow-[0_0_15px_rgba(0,191,255,0.6)]"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let currentSlide = 0;
+  const slider = document.getElementById('slider');
+  const totalSlides = 5;
+
+  function updateSlider() {
+    slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    updateSlider();
+  }
+
+  function prevSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    updateSlider();
+  }
+
+  // Optional: Auto-play
+  setInterval(nextSlide, 5000);
+</script>
+</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+    <section class="py-12 bg-slate-50 dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center mb-10">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white">What Our Members Say</h2>
+        </div>
+
+        <div class="swiper testimonial-swiper">
+            <div class="swiper-wrapper">
+                
+                <div class="swiper-slide">
+                    <div class="testimonial-card bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                        <div class="flex gap-1 text-sky-400 mb-4">
+                            <span class="material-icons text-sm">star</span>
+                            <span class="material-icons text-sm">star</span>
+                            <span class="material-icons text-sm">star</span>
+                            <span class="material-icons text-sm">star</span>
+                            <span class="material-icons text-sm">star</span>
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm italic mb-6">"My experience as a teacher here has been very positive, even though I’m relatively new. In just about a year of teaching, I’ve learned so much myself while also enjoying the process of watching students grow and sometimes even surpass what I know. That, for me, has been one of the most rewarding parts of the journey."</p>
+                        <div class="flex items-center gap-3">
+                            <img alt="User" class="w-10 h-10 rounded-full" src="https://ui-avatars.com/api/?name=Ian+Reddy&background=00BFFF&color=fff" />
+                            <div>
+                                <h4 class="font-bold text-slate-900 dark:text-white text-sm">Ian Reddy</h4>
+                                <p class="text-xs text-slate-500">Non Academic Instructor</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next" style="color: #00BFFF;"></div>
+            <div class="swiper-button-prev" style="color: #00BFFF;"></div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+        <section class="py-20 lg:py-24 bg-white dark:bg-slate-950 relative transition-colors duration-300">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-4">Our Educational
+                        Offerings</h2>
+                    <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto px-4">Discover a wide range of
+                        learning paths tailored for academic success and personal growth.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div
+                        class="offer-card-hover group bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <div
+                            class="w-14 h-14 bg-accent/10 dark:bg-accent/20 rounded-xl flex items-center justify-center mb-6 text-accent dark:text-orange-400 group-hover:scale-110 transition-transform">
+                            <span class="material-icons text-3xl">menu_book</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">CBSE K-12 Resources</h3>
+                        <p class="text-slate-600 dark:text-slate-400 mb-6">Master your curriculum with expert-led video
+                            lessons, interactive quizzes, and comprehensive practice materials.</p>
+                        <a class="inline-flex items-center text-primary dark:text-primary font-bold hover:gap-2 transition-all"
+                            href="studentsResource.html">
+                            Explore Syllabus <span class="material-icons text-sm ml-1">arrow_forward</span>
+                        </a>
+                    </div>
+                    <div
+                        class="offer-card-hover group bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <div
+                            class="w-14 h-14 bg-accent/10 dark:bg-accent/20 rounded-xl flex items-center justify-center mb-6 text-accent dark:text-orange-400 group-hover:scale-110 transition-transform">
+                            <span class="material-icons text-3xl">palette</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">Non-Academic Courses</h3>
+                        <p class="text-slate-600 dark:text-slate-400 mb-6">Explore coding, creative arts, and essential
+                            life skills to grow beyond the classroom and build your future.</p>
+                        <a class="inline-flex items-center text-primary dark:text-primary font-bold hover:gap-2 transition-all"
+                            href="courses.html">
+                            Browse Courses <span class="material-icons text-sm ml-1">arrow_forward</span>
+                        </a>
+                    </div>
+                    <div
+                        class="offer-card-hover group bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <div
+                            class="w-14 h-14 bg-accent/10 dark:bg-accent/20 rounded-xl flex items-center justify-center mb-6 text-accent dark:text-orange-400 group-hover:scale-110 transition-transform">
+                            <span class="material-icons text-3xl">psychology</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">Teacher's Tools</h3>
+                        <p class="text-slate-600 dark:text-slate-400 mb-6">Empowering educators with modern digital
+                            tools, pedagogical strategies, and advanced classroom management skills.</p>
+                        <a class="inline-flex items-center text-primary dark:text-primary font-bold hover:gap-2 transition-all"
+                            href="paperPilelauncher.html">
+                            View Tools <span class="material-icons text-sm ml-1">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-12 lg:py-16 bg-white dark:bg-slate-950 transition-colors duration-300">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div
+                    class="animate-gradient-shift bg-gradient-to-r from-primary via-[#33CCFF] to-primary rounded-2xl lg:rounded-3xl p-8 lg:p-16 relative overflow-hidden shadow-2xl">
+                    <div
+                        class="absolute top-0 right-0 w-1/3 h-full bg-white/10 skew-x-[-15deg] transform translate-x-20 hidden lg:block">
+                    </div>
+                    <div
+                        class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12 text-center lg:text-left">
+                        <div class="lg:w-2/3">
+                            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">Ready to Transform
+                                Your Learning Journey?</h2>
+                            <p class="text-white/90 text-base sm:text-lg">Join thousands of students and educators who
+                                are already excelling with Examfriendly. Book a personalized demo today.</p>
+                        </div>
+                        <div class="lg:w-1/3 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                            <button
+                                class="w-full sm:w-auto px-8 py-4 bg-white text-primary font-bold rounded-xl hover:bg-slate-50 transition-colors whitespace-nowrap">
+                                Book a Demo
+                            </button>
+                            <button
+                                class="w-full sm:w-auto px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white/10 transition-colors whitespace-nowrap">
+                                Contact Sales
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-20 lg:py-24 bg-slate-50 dark:bg-slate-900/50 transition-colors duration-300">
+            <div class="max-w-3xl mx-auto px-4 text-center">
+                <h2 class="text-2xl font-bold mb-4 text-slate-900 dark:text-white">Stay updated with Examfriendly</h2>
+                <p class="text-slate-600 dark:text-slate-400 mb-8">Get the latest educational resources and course
+                    updates delivered straight to your inbox.</p>
+                <form class="flex flex-col sm:flex-row gap-2 max-w-lg mx-auto">
+                    <input
+                        class="flex-grow px-6 py-4 rounded-xl border border-slate-200 dark:border-slate-800 dark:bg-slate-950 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                        placeholder="Enter your email" type="email" />
+                    <button
+                        class="px-8 py-4 bg-primary text-white font-bold rounded-xl hover:brightness-110 transition-all shadow-lg shadow-primary/20"
+                        type="submit">Subscribe</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <footer
+        class="bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 pt-16 pb-8 relative z-10 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 bg-white dark:bg-slate-800 border border-primary rounded-md flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-lg">school</span>
+                        </div>
+                        <span
+                            class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Examfriendly</span>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                        Leading the future of digital education with accessible, high-quality learning resources for
+                        students and teachers worldwide.
+                    </p>
+                    <div class="flex gap-4">
+                        <a class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
+                            href="https://linkedin.com/company/exam-friendly" target="_blank">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 382 382"> <path d="M347.445,0H34.555C15.471,0,0,15.471,0,34.555v312.889C0,366.529,15.471,382,34.555,382h312.889 C366.529,382,382,366.529,382,347.444V34.555C382,15.471,366.529,0,347.445,0z M118.207,329.844c0,5.554-4.502,10.056-10.056,10.056 H65.345c-5.554,0-10.056-4.502-10.056-10.056V150.403c0-5.554,4.502-10.056,10.056-10.056h42.806 c5.554,0,10.056,4.502,10.056,10.056V329.844z M86.748,123.432c-22.459,0-40.666-18.207-40.666-40.666S64.289,42.1,86.748,42.1 s40.666,18.207,40.666,40.666S109.208,123.432,86.748,123.432z M341.91,330.654c0,5.106-4.14,9.246-9.246,9.246H286.73 c-5.106,0-9.246-4.14-9.246-9.246v-84.168c0-12.556,3.683-55.021-32.813-55.021c-28.309,0-34.051,29.066-35.204,42.11v97.079 c0,5.106-4.139,9.246-9.246,9.246h-44.426c-5.106,0-9.246-4.14-9.246-9.246V149.593c0-5.106,4.14-9.246,9.246-9.246h44.426 c5.106,0,9.246,4.14,9.246,9.246v15.655c10.497-15.753,26.097-27.912,59.312-27.912c73.552,0,73.131,68.716,73.131,106.472 L341.91,330.654L341.91,330.654z">
+                            </path> 
+                        </svg>
+                    </svg>
+                        </a>
+                        <a class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
+                            href="https://www.instagram.com/examfriendly_tutorials/" target="_blank">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849s-.011 3.584-.069 4.849c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.849-.07c-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849s.012-3.584.07-4.849c.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.358-.2 6.78-2.618 6.98-6.98.058-1.28.072-1.689.072-4.948s-.014-3.667-.072-4.947c-.2-4.358-2.618-6.78-6.98-6.98-1.28-.058-1.689-.072-4.948-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z">
+                                </path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6 text-slate-900 dark:text-white">Programs</h4>
+                    <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a class="hover:text-primary transition-colors" href="#">CBSE Tutorials</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">NCERT Solutions</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Coding Courses for kids</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Maharashtra State Board Textbook Solutions</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6 text-slate-900 dark:text-white">Support</h4>
+                    <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Terms of Service</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6 text-slate-900 dark:text-white">Contact</h4>
+                    <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+                        <li class="flex items-start gap-3">
+                            <span class="material-icons text-primary text-sm mt-1">location_on</span>
+                            <span>401201,Vasai West , Mumbai , Maharashtra </span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="material-icons text-primary text-sm">email</span>
+                            <span>inquiry@examfriendly.in</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="material-icons text-primary text-sm">phone</span>
+                            <span>+91 70668 34012</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+    const swiper = new Swiper('.testimonial-swiper', {
+    slidesPerView: 1,
+    spaceBetween: 24,
+    autoHeight: true, // Container adjusts to the height of the active slide(s)
+    loop: true,
+    autoplay: {
+        delay: 5000,
+    },
+    pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+    },
+    navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+    },
+    breakpoints: {
+        // Tablet
+        768: {
+            slidesPerView: 2,
+        },
+        // Desktop
+        1024: {
+            slidesPerView: 3,
+        }
+    }
+});
+</script>
+
+    </footer>
+
+</body>
+
+</html>

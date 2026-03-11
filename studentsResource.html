@@ -1,0 +1,398 @@
+<html class="scroll-smooth" lang="en">
+
+<head>
+    <script src="theme.js"></script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Examfriendly | Empowering the Next Generation of Learners</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+        <script src="navbar.js"></script>
+    <style type="text/tailwindcss">
+        html, body {
+  /* This stops the "rubber-band" bounce effect at the edges */
+        overscroll-behavior-y: none; 
+        }
+        :root {
+            --deep-sky-blue: #00BFFF;
+            --brand-orange: #FF8C00;
+        }
+        @layer base {
+            .bg-deep-sky-blue { background-color: var(--deep-sky-blue); }
+            .text-deep-sky-blue { color: var(--deep-sky-blue); }
+            .bg-brand-orange { background-color: var(--brand-orange); }
+            .text-brand-orange { color: var(--brand-orange); }
+            .border-deep-sky-blue { border-color: var(--deep-sky-blue); }
+        }
+        @keyframes continuousWipe {
+            0% { transform: translateX(-150%); }
+            70% { transform: translateX(250%); }
+            100% { transform: translateX(250%); }
+        }
+        .navbar-wipe-v2 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 76%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 191, 255, 0.22), transparent);
+            z-index: -1;
+            animation: continuousWipe 13s linear infinite;
+            animation-delay: 3s;
+            filter: blur(14px);
+        }
+        @keyframes navLineGrow {
+            0% { transform: scaleX(0); }
+            100% { transform: scaleX(1); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes softFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes floatingSlow {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(15px, -15px); }
+            66% { transform: translate(-10px, 10px); }
+        }
+        .navbar-bottom-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--deep-sky-blue), transparent);
+            transform-origin: center;
+            animation: navLineGrow 2.5s ease-out forwards;
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 1s ease-out forwards;
+        }
+        .animate-soft-float {
+            animation: softFloat 4s ease-in-out infinite;
+        }
+        .animate-gradient-shift {
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+        }
+        .animate-floating-slow {
+            animation: floatingSlow 6s ease-in-out infinite;
+        }
+        .offer-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .offer-card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 40px -10px rgba(0, 191, 255, 0.3);
+            border-color: var(--deep-sky-blue);
+        }
+        .testimonial-card {
+            transition: all 0.3s ease;
+        }
+        .testimonial-card:hover {
+            transform: scale(1.02);
+        }
+        #mobile-menu-checkbox:checked ~ #mobile-menu {
+            transform: translateX(0);
+        }
+        #mobile-menu-checkbox:checked ~ #mobile-menu-overlay {
+            opacity: 1;
+            pointer-events: auto;
+        }
+         /*Step Animations*/
+            @keyframes stepDown {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.95); }
+        }
+
+        .animate-step-down {
+            animation: stepDown 0.4s ease-out forwards;
+        }
+
+        .exit-animation {
+            animation: fadeOut 0.3s ease-in forwards;
+        }
+
+</style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00BFFF",
+                        "accent": "#FF8C00",
+                        "background-light": "#FFFFFF",
+                        "background-dark": "#0A0F1C",
+                        "slate-950": "#020617",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<header class="relative z-[100]">
+    <exam-navbar></exam-navbar>
+    </header>
+<body class="font-display pt-24 bg-white text-slate-900 dark:bg-slate-950 dark:text-white antialiased overflow-x-hidden">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-20 left-[10%] w-4 h-4 bg-primary opacity-20 rounded-full animate-floating-slow"></div>
+        <div class="absolute top-40 right-[15%] w-3 h-3 bg-accent opacity-20 rounded-full animate-floating-slow"
+            style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-40 left-[5%] w-6 h-6 border-2 border-primary opacity-10 rounded-full animate-floating-slow"
+            style="animation-delay: 2s;"></div>
+        <div class="absolute top-[60%] right-[10%] w-4 h-4 border-2 border-accent opacity-10 rounded-full animate-floating-slow"
+            style="animation-delay: 1.5s;"></div>
+        <div class="absolute top-[80%] left-[20%] w-2 h-2 bg-primary opacity-30 rounded-full animate-floating-slow"
+            style="animation-delay: 0.5s;"></div>
+    </div>
+    
+    <div class="w-full flex flex-col items-center py-12 px-6 space-y-10">
+  <h2 class="text-[#00bfff] text-3xl font-bold border-b-4 border-current pb-2">View Notes / Resources</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
+  <div class="relative group">
+    <label class="block text-[#00bfff] text-sm font-semibold mb-2">Select Board</label>
+    <select id="boardSelect" onchange="fetchStandards()" class="w-full bg-orange-500 text-white font-medium py-3 px-4 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-4 focus:ring-[#00bfff] transition-all shadow-lg">
+      <option value="" disabled selected>Loading Boards...</option>
+    </select>
+  </div>
+
+  <div class="relative group">
+    <label class="block text-[#00bfff] text-sm font-semibold mb-2">Select Standard</label>
+    <select id="standardSelect" onchange="fetchSubjects()" disabled class="w-full bg-orange-500 text-white font-medium py-3 px-4 rounded-lg appearance-none cursor-not-allowed opacity-50 focus:outline-none focus:ring-4 focus:ring-[#00bfff] transition-all shadow-lg">
+      <option value="" disabled selected>Select Board First</option>
+    </select>
+  </div>
+
+  <div class="relative group">
+    <label class="block text-[#00bfff] text-sm font-semibold mb-2">Select Subject</label>
+    <select id="subjectSelect" onchange="fetchChapters()" disabled class="w-full bg-orange-500 text-white font-medium py-3 px-4 rounded-lg appearance-none cursor-not-allowed opacity-50 focus:outline-none focus:ring-4 focus:ring-[#00bfff] transition-all shadow-lg">
+      <option value="" disabled selected>Select Standard First</option>
+    </select>
+  </div>
+</div>
+
+<div id="notesArea" class="w-full max-w-4xl mt-8">
+  <h3 class="text-xl font-semibold hidden mb-4" id="notesTitle">Available Notes </h3>
+  <div id="notesList" class="grid grid-cols-1 gap-3"></div>
+</div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://qomhhffaetgwjvifgcai.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvbWhoZmZhZXRnd2p2aWZnY2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMzY2NjQsImV4cCI6MjA4NjgxMjY2NH0.4Uf9enXmwlMEGZez8E9tNOzfh9AA74qcTUz15yfz1lQ';
+  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const boardDropdown = document.getElementById('boardSelect');
+        const standardDropdown = document.getElementById('standardSelect');
+        const subjectDropdown = document.getElementById('subjectSelect');
+        const notesList = document.getElementById('notesList');
+        const notesTitle = document.getElementById('notesTitle');
+
+        // 1. Initial Load: Fetch Boards
+        async function init() {
+        const { data, error } = await _supabase.from('boards').select('*');
+        if (data) {
+        boardDropdown.innerHTML = '<option value="" disabled selected>Choose a Board</option>';
+        data.forEach(board => {
+            boardDropdown.innerHTML += `<option value="${board.id}">${board.name}</option>`;
+        });
+        }
+        }
+
+        // 2. Fetch Standards based on Board
+        async function fetchStandards() {
+        const boardId = boardDropdown.value;
+        resetDropdown(standardDropdown, "Choose Standard");
+        resetDropdown(subjectDropdown, "Select Standard First");
+        clearNotesList();
+
+        const { data } = await _supabase.from('standards').select('*').eq('board_id', boardId);
+        if (data) {
+        enableDropdown(standardDropdown);
+        data.forEach(std => {
+            standardDropdown.innerHTML += `<option value="${std.id}">${std.name}</option>`;
+        });
+        }
+        }
+
+        // 3. Fetch Subjects based on Standard
+        async function fetchSubjects() {
+        const standardId = standardDropdown.value;
+        resetDropdown(subjectDropdown, "Choose Subject");
+        clearNotesList();
+
+        const { data } = await _supabase.from('subject').select('*').eq('standard_id', standardId);
+        if (data) {
+        enableDropdown(subjectDropdown);
+        data.forEach(sub => {
+            subjectDropdown.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
+        });
+        }
+        }
+
+        // 4. Fetch Chapters (Notes) based on Subject
+        async function fetchChapters() {
+        const subjectId = subjectDropdown.value;
+        clearNotesList();
+
+        const { data, error } = await _supabase
+        .from('chapters')
+        .select('*')
+        .eq('subject_id', subjectId); // Ensure your DB column is 'subject_id'
+
+        if (data && data.length > 0) {
+        notesTitle.classList.remove('hidden');
+        data.forEach((chap, index) => {
+            const card = document.createElement('div');
+            card.className = "flex items-center justify-between bg-white/5 backdrop-blur-md p-4 rounded-xl border border-gray-200 hover:border-[#00bfff] transition-all shadow-sm w-full animate-fadeIn";
+            card.style.animationDelay = `${index * 0.05}s`;
+            
+            card.innerHTML = `
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-orange-500">description</span>
+                <span class="font-medium text-lg">${chap.name}</span>
+            </div>
+            <a href="${chap.pdf_url || '#'}" target="_blank" 
+                class="${chap.pdf_url ? 'flex' : 'hidden'} items-center gap-2 bg-[#00bfff] text-white px-5 py-2.5 rounded-lg font-bold hover:scale-105 transition-all">
+                <span>Download</span>
+                <span class="material-symbols-outlined text-[20px]">download</span>
+            </a>
+            `;
+            notesList.appendChild(card);
+        });
+        }
+        }
+
+        // Helper Functions
+        function resetDropdown(dropdown, text) {
+        dropdown.disabled = true;
+        dropdown.classList.add('cursor-not-allowed', 'opacity-50');
+        dropdown.innerHTML = `<option value="" disabled selected>${text}</option>`;
+        }
+
+        function enableDropdown(dropdown) {
+        dropdown.disabled = false;
+        dropdown.classList.remove('cursor-not-allowed', 'opacity-50');
+        }
+
+        function clearNotesList() {
+        notesList.innerHTML = '';
+        notesTitle.classList.add('hidden');
+        }
+
+        init();
+</script>
+    <footer
+        class="bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 pt-16 pb-8 relative z-10 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 bg-white dark:bg-slate-800 border border-primary rounded-md flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-lg">school</span>
+                        </div>
+                        <span
+                            class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Examfriendly</span>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                        Leading the future of digital education with accessible, high-quality learning resources for
+                        students and teachers worldwide.
+                    </p>
+                    <div class="flex gap-4">
+                        <a class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
+                            href="#">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z">
+                                </path>
+                            </svg>
+                        </a>
+                        <a class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
+                            href="#">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849s-.011 3.584-.069 4.849c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.849-.07c-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849s.012-3.584.07-4.849c.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.358-.2 6.78-2.618 6.98-6.98.058-1.28.072-1.689.072-4.948s-.014-3.667-.072-4.947c-.2-4.358-2.618-6.78-6.98-6.98-1.28-.058-1.689-.072-4.948-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z">
+                                </path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6 text-slate-900 dark:text-white">Programs</h4>
+                    <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a class="hover:text-primary transition-colors" href="#">CBSE Tutorials</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">JEE/NEET Prep</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Coding for Kids</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Skill Development</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6 text-slate-900 dark:text-white">Support</h4>
+                    <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a class="hover:text-primary transition-colors" href="#">Help Center</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Terms of Service</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6 text-slate-900 dark:text-white">Contact</h4>
+                    <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+                        <li class="flex items-start gap-3">
+                            <span class="material-icons text-primary text-sm mt-1">location_on</span>
+                            <span>401201,Vasai West , Mumbai , Maharashtra </span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="material-icons text-primary text-sm">email</span>
+                            <span>inquiry@examfriendly.in</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="material-icons text-primary text-sm">phone</span>
+                            <span>+91 70668 34012</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-slate-100 dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400">
+                <p>© 2026 Examfriendly EdTech Pvt Ltd. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a class="hover:text-primary" href="#">Cookie Settings</a>
+                    <a class="hover:text-primary" href="#">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

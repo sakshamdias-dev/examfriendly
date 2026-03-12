@@ -113,12 +113,11 @@
                     <div class="space-y-4">
                         <label class="text-xs font-bold uppercase tracking-wider text-primary">Basic Information</label>
                         <input type="text" id="course-name" placeholder="Course Title" class="modern-input" required oninput="updatePreview()">
-                        
                         <div class="space-y-2">
                             <label class="text-[10px] font-bold text-slate-400 uppercase">Course Thumbnail</label>
                             <input type="file" id="course-file" accept="image/*" class="modern-input cursor-pointer file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/80" onchange="handleFileSelect(this)">
-                            <input type="hidden" id="course-image-url"> </div>
-
+                            <input type="hidden" id="course-image-url"> 
+                        </div>
                         <div class="grid grid-cols-2 gap-4">
                             <input type="number" id="price" oninput="updatePreview()" class="modern-input" placeholder="Price (₹)">
                             <select id="fee_type" class="modern-input">
@@ -147,7 +146,12 @@
                     </div>
                 </form>
 
-                <div id="student-list-container" class="hidden space-y-4"></div>
+                <div id="student-list-container" class="hidden space-y-4">
+                    <div class="mb-4">
+                        <input type="text" id="student-search" placeholder="Search by name, parent, or school..." class="modern-input" onkeyup="filterStudents()">
+                    </div>
+                    <div id="student-cards-grid" class="space-y-4"></div>
+                </div>
             </div>
 
             <div id="modal-footer" class="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-4">
@@ -199,17 +203,9 @@ async function uploadImage(file) {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random()}.${fileExt}`;
     const filePath = `thumbnails/${fileName}`;
-
-    const { data, error } = await supabaseClient.storage
-        .from('course-thumbnails') // MAKE SURE THIS BUCKET EXISTS IN SUPABASE
-        .upload(filePath, file);
-
+    const { data, error } = await supabaseClient.storage.from('course-thumbnails').upload(filePath, file);
     if (error) throw error;
-
-    const { data: { publicUrl } } = supabaseClient.storage
-        .from('course-thumbnails')
-        .getPublicUrl(filePath);
-
+    const { data: { publicUrl } } = supabaseClient.storage.from('course-thumbnails').getPublicUrl(filePath);
     return publicUrl;
 }
 
@@ -219,7 +215,6 @@ function openModal(mode) {
     const studentList = document.getElementById('student-list-container');
     const sidebar = document.getElementById('modal-sidebar');
     const publishBtn = document.getElementById('publish-btn');
-
     modal.classList.remove('hidden');
 
     if(mode === 'course') {
@@ -284,26 +279,43 @@ async function loadCourses() {
 function openEditModal(course) {
     currentEditingId = course.id;
     openModal('course');
-    
     document.getElementById('course-name').value = course.name;
     document.getElementById('course-image-url').value = course.img_url || '';
     if(course.img_url) {
         document.getElementById('preview-img').src = course.img_url;
         document.getElementById('preview-img').classList.remove('hidden');
     }
-
     document.getElementById('price').value = course.price;
     document.getElementById('fee_type').value = course.fee_type || 'one-time';
     document.getElementById('course-deadline').value = course.reg_deadline || '';
     document.getElementById('course-entry').value = course.entry_size || '';
     document.getElementById('course-reg-link').value = course.reg_link || '';
-
     const container = document.getElementById('sections-container');
     container.innerHTML = '';
     if (course.details && Array.isArray(course.details)) {
         course.details.forEach(sec => addSection(sec.title, sec.content));
     }
     updatePreview();
+}
+
+// DELETE FIX: Cascade Deletion
+async function deleteCourse(id) {
+    if(confirm('Are you sure? This will also delete all student registrations for this course.')) {
+        try {
+            // 1. Delete associated registrations first to avoid FK constraint error
+            const { error: regError } = await supabaseClient.from('income_registrations').delete().eq('course_id', id);
+            if (regError) throw regError;
+
+            // 2. Delete the course
+            const { error: courseError } = await supabaseClient.from('course_created').delete().eq('id', id);
+            if (courseError) throw courseError;
+
+            alert('Course and registrations deleted successfully.');
+            loadCourses();
+        } catch (err) {
+            alert('Deletion failed: ' + err.message);
+        }
+    }
 }
 
 document.getElementById('course-form').addEventListener('submit', async (e) => {
@@ -315,17 +327,13 @@ document.getElementById('course-form').addEventListener('submit', async (e) => {
     try {
         let imgUrl = document.getElementById('course-image-url').value;
         const fileInput = document.getElementById('course-file');
-        
-        // If a new file is chosen, upload it first
         if (fileInput.files.length > 0) {
             imgUrl = await uploadImage(fileInput.files[0]);
         }
-        
         const sections = Array.from(document.querySelectorAll('.dynamic-section-card')).map(box => ({
             title: box.querySelector('.section-title').value,
             content: box.querySelector('.section-content').value
         }));
-
         const payload = {
             name: document.getElementById('course-name').value,
             price: parseFloat(document.getElementById('price').value) || 0,
@@ -336,16 +344,8 @@ document.getElementById('course-form').addEventListener('submit', async (e) => {
             entry_size: parseInt(document.getElementById('course-entry').value) || null,
             details: sections
         };
-
-        let result;
-        if (currentEditingId) {
-            result = await supabaseClient.from('course_created').update(payload).eq('id', currentEditingId);
-        } else {
-            result = await supabaseClient.from('course_created').insert([payload]);
-        }
-
+        let result = currentEditingId ? await supabaseClient.from('course_created').update(payload).eq('id', currentEditingId) : await supabaseClient.from('course_created').insert([payload]);
         if (result.error) throw result.error;
-
         alert(currentEditingId ? "Course Updated!" : "Course Published!");
         closeModal(); 
         loadCourses(); 
@@ -357,7 +357,6 @@ document.getElementById('course-form').addEventListener('submit', async (e) => {
     }
 });
 
-// Other functions (Registrations, CSV, etc.) remain the same
 async function loadRegistrations() {
     const { data, error } = await supabaseClient.from('course_created').select(`id, name, income_registrations (id)`);
     if (error) return console.error(error);
@@ -384,33 +383,33 @@ async function loadRegistrations() {
 async function viewStudentDetails(courseId, courseName) {
     openModal('registration');
     document.getElementById('modal-title').innerText = `Leads: ${courseName}`;
-    const container = document.getElementById('student-list-container');
+    const container = document.getElementById('student-cards-grid');
     container.innerHTML = '<p class="text-center animate-pulse text-primary font-bold">Fetching deep insights...</p>';
+    document.getElementById('student-search').value = '';
 
-    const { data: students, error } = await supabaseClient
-        .from('income_registrations')
-        .select('*')
-        .eq('course_id', courseId)
-        .order('created_at', { ascending: false });
-
+    const { data: students, error } = await supabaseClient.from('income_registrations').select('*').eq('course_id', courseId).order('created_at', { ascending: false });
     if (error) return alert("Error fetching students");
 
+    window.currentStudents = students; // Store for filtering
+    renderStudentCards(students);
+}
+
+function renderStudentCards(students) {
+    const container = document.getElementById('student-cards-grid');
     container.innerHTML = students.length ? students.map(s => `
-        <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-6 rounded-3xl shadow-sm space-y-5 relative overflow-hidden">
+        <div class="student-card bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-6 rounded-3xl shadow-sm space-y-5 relative overflow-hidden" 
+             data-search="${(s.student_name + s.parent_name + s.school_name).toLowerCase()}">
             <div class="flex justify-between items-start">
                 <div>
                     <h4 class="font-bold text-xl text-slate-900 dark:text-white">${s.student_name}</h4>
-                    <p class="text-xs text-slate-400 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-[14px]">mail</span> ${s.student_email}
-                    </p>
+                    <p class="text-xs text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">mail</span> ${s.student_email}</p>
                 </div>
-                <select onchange="updateStatus('${s.id}', this.value)" class="text-[10px] font-bold rounded-full px-3 py-1 border-none bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                <select onchange="updateStatus('${s.id}', this.value)" class="text-[10px] font-bold rounded-full px-3 py-1 border-none bg-slate-100 dark:bg-slate-700">
                     <option value="New" ${s.status === 'New' ? 'selected' : ''}>NEW</option>
                     <option value="Contacted" ${s.status === 'Contacted' ? 'selected' : ''}>CONTACTED</option>
                     <option value="Paid" ${s.status === 'Paid' ? 'selected' : ''}>PAID</option>
                 </select>
             </div>
-
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                 <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl">
                     <p class="text-[9px] font-bold text-slate-400 uppercase">Grade & Age</p>
@@ -425,83 +424,51 @@ async function viewStudentDetails(courseId, courseName) {
                     <p class="text-xs font-semibold">${s.coding_experience || 'None'}</p>
                 </div>
             </div>
-
-            <div class="border-t border-slate-100 dark:border-slate-700 pt-4">
-                <div class="flex items-center gap-4 text-xs">
-                    <div class="flex-1">
-                        <p class="text-[9px] font-bold text-primary uppercase">Parent Name</p>
-                        <p class="font-bold text-slate-700 dark:text-slate-200">${s.parent_name || 'Not Provided'}</p>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-[9px] font-bold text-primary uppercase">Parent Contact</p>
-                        <a href="tel:${s.parent_contact}" class="font-bold text-primary hover:underline">${s.parent_contact || 'N/A'}</a>
-                    </div>
-                </div>
+            <div class="border-t border-slate-100 dark:border-slate-700 pt-4 flex gap-4 text-xs">
+                <div class="flex-1"><p class="text-[9px] font-bold text-primary uppercase">Parent Name</p><p class="font-bold">${s.parent_name || 'N/A'}</p></div>
+                <div class="flex-1"><p class="text-[9px] font-bold text-primary uppercase">Parent Contact</p><a href="tel:${s.parent_contact}" class="font-bold text-primary">${s.parent_contact || 'N/A'}</a></div>
             </div>
-            
             <div class="flex gap-4">
-                <a href="tel:${s.phone_number}" class="flex-1 bg-slate-100 dark:bg-slate-900 p-3 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all">
-                    <span class="material-symbols-outlined text-sm">call</span> Student
-                </a>
-                <a href="https://wa.me/${s.whatsapp_no}?text=Hi%20${s.student_name},%20this%20is%20Examfriendly..." target="_blank" class="flex-1 bg-green-500/10 text-green-600 p-3 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2 hover:bg-green-500 hover:text-white transition-all">
-                    <span class="material-symbols-outlined text-sm">chat</span> WhatsApp
-                </a>
+                <a href="tel:${s.phone_number}" class="flex-1 bg-slate-100 dark:bg-slate-900 p-3 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">call</span> Student</a>
+                <a href="https://wa.me/${s.whatsapp_no}?text=Hi%20${s.student_name}..." target="_blank" class="flex-1 bg-green-500/10 text-green-600 p-3 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">chat</span> WhatsApp</a>
             </div>
-
             <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border-l-4 border-secondary">
-                <div class="flex justify-between items-center mb-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Requirements & Referral</p>
-                    <span class="text-[9px] bg-secondary/10 text-secondary px-2 py-0.5 rounded-full font-bold uppercase">${s.referral_source || 'Direct'}</span>
-                </div>
-                <p class="text-sm italic text-slate-600 dark:text-slate-300">"${s.requirements || 'No specific requirements mentioned.'}"</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Requirements</p>
+                <p class="text-sm italic text-slate-600 dark:text-slate-300">"${s.requirements || 'None'}"</p>
             </div>
         </div>
-    `).join('') : '<p class="text-center py-10 text-slate-400">No students registered yet.</p>';
+    `).join('') : '<p class="text-center py-10 text-slate-400">No students found.</p>';
+}
+
+function filterStudents() {
+    const term = document.getElementById('student-search').value.toLowerCase();
+    const cards = document.querySelectorAll('.student-card');
+    cards.forEach(card => {
+        const text = card.getAttribute('data-search');
+        card.style.display = text.includes(term) ? 'block' : 'none';
+    });
 }
 
 async function updateStatus(regId, newStatus) {
     await supabaseClient.from('income_registrations').update({ status: newStatus }).eq('id', regId);
 }
 
-async function deleteCourse(id) {
-    if(confirm('Delete course?')) {
-        await supabaseClient.from('course_created').delete().eq('id', id);
-        loadCourses();
-    }
-}
-
 async function exportToCSV(courseId, courseName) {
     const { data: students, error } = await supabaseClient.from('income_registrations').select('*').eq('course_id', courseId);
     if (error || !students.length) return alert("No data to export");
 
-    // Updated headers to include your new columns
-    const headers = [
-        "Student Name", "Email", "Phone", "WhatsApp", "Age", "Grade", 
-        "School", "Parent Name", "Parent Contact", "Coding Exp", 
-        "Source", "Status", "Requirements", "Date"
-    ];
+    const headers = ["Student Name", "Email", "Phone", "WhatsApp", "Age", "Grade", "School", "Parent Name", "Parent Contact", "Coding Exp", "Source", "Status", "Requirements", "Date"];
+    const csvContent = [
+        headers.join(","),
+        ...students.map(s => [
+            `"${s.student_name}"`, s.student_email, s.phone_number, s.whatsapp_no, s.student_age || '', s.student_grade || '', `"${s.school_name || ''}"`, `"${s.parent_name || ''}"`, s.parent_contact || '', `"${s.coding_experience || ''}"`, s.referral_source || '', s.status, `"${(s.requirements || '').replace(/"/g, '""')}"`, new Date(s.created_at).toLocaleDateString()
+        ].join(","))
+    ].join("\n");
 
-    const rows = students.map(s => [
-        `"${s.student_name}"`,
-        s.student_email,
-        s.phone_number,
-        s.whatsapp_no,
-        s.student_age || '',
-        s.student_grade || '',
-        `"${s.school_name || ''}"`,
-        `"${s.parent_name || ''}"`,
-        s.parent_contact || '',
-        `"${s.coding_experience || ''}"`,
-        s.referral_source || '',
-        s.status,
-        `"${(s.requirements || '').replace(/"/g, '""')}"`,
-        new Date(s.created_at).toLocaleDateString()
-    ]);
-
-    let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
-    link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", `Detailed_Leads_${courseName.replace(/\s+/g, '_')}.csv`);
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `Leads_${courseName.replace(/\s+/g, '_')}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

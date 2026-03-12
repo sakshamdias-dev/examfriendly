@@ -100,6 +100,7 @@
                 <h3 id="modal-title" class="text-xl font-bold text-slate-900 dark:text-white mb-2">Manage</h3>
                 <div id="live-preview-box" class="mt-8 p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm">
                     <p class="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-2">Live Preview</p>
+                    <img id="preview-img" src="" class="w-full h-24 object-cover rounded-lg mb-2 hidden" />
                     <div id="preview-name" class="text-sm font-bold text-primary truncate">New Course Title</div>
                     <div id="preview-price" class="text-lg font-black text-secondary">₹0</div>
                 </div>
@@ -112,7 +113,12 @@
                     <div class="space-y-4">
                         <label class="text-xs font-bold uppercase tracking-wider text-primary">Basic Information</label>
                         <input type="text" id="course-name" placeholder="Course Title" class="modern-input" required oninput="updatePreview()">
-                        <input type="url" id="course-image" placeholder="Thumbnail URL" class="modern-input">
+                        
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Course Thumbnail</label>
+                            <input type="file" id="course-file" accept="image/*" class="modern-input cursor-pointer file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/80" onchange="handleFileSelect(this)">
+                            <input type="hidden" id="course-image-url"> </div>
+
                         <div class="grid grid-cols-2 gap-4">
                             <input type="number" id="price" oninput="updatePreview()" class="modern-input" placeholder="Price (₹)">
                             <select id="fee_type" class="modern-input">
@@ -159,7 +165,7 @@ const _supabaseUrl = 'https://qomhhffaetgwjvifgcai.supabase.co';
 const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvbWhoZmZhZXRnd2p2aWZnY2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMzY2NjQsImV4cCI6MjA4NjgxMjY2NH0.4Uf9enXmwlMEGZez8E9tNOzfh9AA74qcTUz15yfz1lQ';
 const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseKey);
 
-let currentEditingId = null; // Track ID if editing
+let currentEditingId = null;
 
 function switchTab(tabName, element) {
     document.querySelectorAll('.tab-btn').forEach(item => {
@@ -174,6 +180,37 @@ function switchTab(tabName, element) {
     
     if (tabName === 'courses') loadCourses();
     if (tabName === 'registration') loadRegistrations();
+}
+
+function handleFileSelect(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const previewImg = document.getElementById('preview-img');
+            previewImg.src = e.target.result;
+            previewImg.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+async function uploadImage(file) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `thumbnails/${fileName}`;
+
+    const { data, error } = await supabaseClient.storage
+        .from('course-thumbnails') // MAKE SURE THIS BUCKET EXISTS IN SUPABASE
+        .upload(filePath, file);
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = supabaseClient.storage
+        .from('course-thumbnails')
+        .getPublicUrl(filePath);
+
+    return publicUrl;
 }
 
 function openModal(mode) {
@@ -204,6 +241,7 @@ function closeModal() {
     document.getElementById('course-modal').classList.add('hidden'); 
     document.getElementById('course-form').reset(); 
     document.getElementById('sections-container').innerHTML = ''; 
+    document.getElementById('preview-img').classList.add('hidden');
     currentEditingId = null; 
     updatePreview(); 
 }
@@ -248,7 +286,12 @@ function openEditModal(course) {
     openModal('course');
     
     document.getElementById('course-name').value = course.name;
-    document.getElementById('course-image').value = course.img_url || '';
+    document.getElementById('course-image-url').value = course.img_url || '';
+    if(course.img_url) {
+        document.getElementById('preview-img').src = course.img_url;
+        document.getElementById('preview-img').classList.remove('hidden');
+    }
+
     document.getElementById('price').value = course.price;
     document.getElementById('fee_type').value = course.fee_type || 'one-time';
     document.getElementById('course-deadline').value = course.reg_deadline || '';
@@ -263,13 +306,61 @@ function openEditModal(course) {
     updatePreview();
 }
 
+document.getElementById('course-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveBtn = e.submitter;
+    saveBtn.innerText = "Processing...";
+    saveBtn.disabled = true;
+
+    try {
+        let imgUrl = document.getElementById('course-image-url').value;
+        const fileInput = document.getElementById('course-file');
+        
+        // If a new file is chosen, upload it first
+        if (fileInput.files.length > 0) {
+            imgUrl = await uploadImage(fileInput.files[0]);
+        }
+        
+        const sections = Array.from(document.querySelectorAll('.dynamic-section-card')).map(box => ({
+            title: box.querySelector('.section-title').value,
+            content: box.querySelector('.section-content').value
+        }));
+
+        const payload = {
+            name: document.getElementById('course-name').value,
+            price: parseFloat(document.getElementById('price').value) || 0,
+            fee_type: document.getElementById('fee_type').value,
+            img_url: imgUrl,
+            reg_link: document.getElementById('course-reg-link').value,
+            reg_deadline: document.getElementById('course-deadline').value || null,
+            entry_size: parseInt(document.getElementById('course-entry').value) || null,
+            details: sections
+        };
+
+        let result;
+        if (currentEditingId) {
+            result = await supabaseClient.from('course_created').update(payload).eq('id', currentEditingId);
+        } else {
+            result = await supabaseClient.from('course_created').insert([payload]);
+        }
+
+        if (result.error) throw result.error;
+
+        alert(currentEditingId ? "Course Updated!" : "Course Published!");
+        closeModal(); 
+        loadCourses(); 
+    } catch (err) {
+        alert("Operation failed: " + err.message);
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerText = currentEditingId ? "Update Course" : "Publish Course";
+    }
+});
+
+// Other functions (Registrations, CSV, etc.) remain the same
 async function loadRegistrations() {
-    const { data, error } = await supabaseClient
-        .from('course_created')
-        .select(`id, name, income_registrations (id)`);
-
+    const { data, error } = await supabaseClient.from('course_created').select(`id, name, income_registrations (id)`);
     if (error) return console.error(error);
-
     document.getElementById('reg-table-body').innerHTML = data.map(course => {
         const count = course.income_registrations ? course.income_registrations.length : 0;
         return `
@@ -295,37 +386,22 @@ async function viewStudentDetails(courseId, courseName) {
     document.getElementById('modal-title').innerText = `Leads: ${courseName}`;
     const container = document.getElementById('student-list-container');
     container.innerHTML = '<p class="text-center animate-pulse">Fetching details...</p>';
-
-    const { data: students, error } = await supabaseClient
-        .from('income_registrations')
-        .select('*')
-        .eq('course_id', courseId);
-
+    const { data: students, error } = await supabaseClient.from('income_registrations').select('*').eq('course_id', courseId);
     if (error) return alert("Error fetching students");
-
     container.innerHTML = students.length ? students.map(s => `
         <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-5 rounded-2xl shadow-sm space-y-4">
             <div class="flex justify-between items-start">
-                <div>
-                    <h4 class="font-bold text-lg text-slate-900 dark:text-white">${s.student_name}</h4>
-                    <p class="text-xs text-slate-400">${s.student_email}</p>
-                </div>
+                <div><h4 class="font-bold text-lg text-slate-900 dark:text-white">${s.student_name}</h4><p class="text-xs text-slate-400">${s.student_email}</p></div>
                 <select onchange="updateStatus('${s.id}', this.value)" class="text-[10px] font-bold rounded-lg border-none bg-slate-100 dark:bg-slate-700">
                     <option value="New" ${s.status === 'New' ? 'selected' : ''}>NEW</option>
                     <option value="Contacted" ${s.status === 'Contacted' ? 'selected' : ''}>CONTACTED</option>
                     <option value="Paid" ${s.status === 'Paid' ? 'selected' : ''}>PAID</option>
                 </select>
             </div>
-            
             <div class="flex gap-4">
-                <a href="tel:${s.phone_number}" class="flex-1 bg-slate-50 dark:bg-slate-900 p-2 rounded-xl text-center text-xs font-bold border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined text-sm">call</span> Call
-                </a>
-                <a href="https://wa.me/${s.whatsapp_no}?text=Hi%20${s.student_name}..." target="_blank" class="flex-1 bg-green-500/10 text-green-600 p-2 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined text-sm">chat</span> WhatsApp
-                </a>
+                <a href="tel:${s.phone_number}" class="flex-1 bg-slate-50 dark:bg-slate-900 p-2 rounded-xl text-center text-xs font-bold border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">call</span> Call</a>
+                <a href="https://wa.me/${s.whatsapp_no}?text=Hi%20${s.student_name}..." target="_blank" class="flex-1 bg-green-500/10 text-green-600 p-2 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">chat</span> WhatsApp</a>
             </div>
-
             <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl">
                 <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Requirements</p>
                 <p class="text-sm italic text-slate-600 dark:text-slate-300">"${s.requirements || 'None'}"</p>
@@ -335,8 +411,7 @@ async function viewStudentDetails(courseId, courseName) {
 }
 
 async function updateStatus(regId, newStatus) {
-    const { error } = await supabaseClient.from('income_registrations').update({ status: newStatus }).eq('id', regId);
-    if (error) alert("Update failed");
+    await supabaseClient.from('income_registrations').update({ status: newStatus }).eq('id', regId);
 }
 
 async function deleteCourse(id) {
@@ -346,53 +421,11 @@ async function deleteCourse(id) {
     }
 }
 
-document.getElementById('course-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const saveBtn = e.submitter;
-    saveBtn.innerText = currentEditingId ? "Updating..." : "Publishing...";
-    saveBtn.disabled = true;
-    
-    const sections = Array.from(document.querySelectorAll('.dynamic-section-card')).map(box => ({
-        title: box.querySelector('.section-title').value,
-        content: box.querySelector('.section-content').value
-    }));
-
-    const payload = {
-        name: document.getElementById('course-name').value,
-        price: parseFloat(document.getElementById('price').value) || 0,
-        fee_type: document.getElementById('fee_type').value,
-        img_url: document.getElementById('course-image').value,
-        reg_link: document.getElementById('course-reg-link').value,
-        reg_deadline: document.getElementById('course-deadline').value || null,
-        entry_size: parseInt(document.getElementById('course-entry').value) || null,
-        details: sections
-    };
-
-    let result;
-    if (currentEditingId) {
-        result = await supabaseClient.from('course_created').update(payload).eq('id', currentEditingId);
-    } else {
-        result = await supabaseClient.from('course_created').insert([payload]);
-    }
-
-    if (result.error) {
-        alert(result.error.message);
-    } else { 
-        closeModal(); 
-        loadCourses(); 
-        alert(currentEditingId ? "Course Updated!" : "Course Published!");
-    }
-
-    saveBtn.disabled = false;
-});
-
 async function exportToCSV(courseId, courseName) {
     const { data: students, error } = await supabaseClient.from('income_registrations').select('*').eq('course_id', courseId);
     if (error || !students.length) return alert("No data to export");
-
     const headers = ["Name", "Email", "Phone", "WhatsApp", "Status", "Requirements", "Date"];
     const rows = students.map(s => [s.student_name, s.student_email, s.phone_number, s.whatsapp_no, s.status, `"${(s.requirements || '').replace(/"/g, '""')}"`, new Date(s.created_at).toLocaleDateString()]);
-
     let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n");
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csvContent));

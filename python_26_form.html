@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration | ExamFriendly</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00BFFF; /* DeepSkyBlue */
+            --action: #FF8C00;  /* Orange */
+            --text-dark: #000000; /* Black */
+            --bg-pure: #FFFFFF;  /* White */
+            --gray-light: #F3F4F6;
+            --input-border: #E5E7EB;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .form-card {
+            background: var(--bg-pure);
+            width: 100%;
+            max-width: 650px;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo-box {
+            height: 60px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-box img { max-height: 100%; }
+
+        /* Course Info Badge */
+        .course-badge {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: left;
+            border-left: 6px solid var(--action);
+        }
+
+        .course-badge h3 { margin: 0; font-size: 18px; font-weight: 800; }
+        .course-badge p { margin: 5px 0 0; font-size: 12px; opacity: 0.9; font-weight: 600; }
+
+        h2 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: -0.5px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .full-width { grid-column: span 2; }
+
+        @media (max-width: 500px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .form-card { padding: 20px; }
+        }
+
+        .group { display: flex; flex-direction: column; }
+
+        label {
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            color: #4b5563;
+        }
+
+        input, select {
+            border: 2px solid var(--input-border);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        /* Coding Experience Selector */
+        .exp-container {
+            display: flex;
+            gap: 8px;
+            background: var(--gray-light);
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .exp-item { flex: 1; position: relative; }
+        .exp-item input { display: none; }
+        .exp-item label {
+            display: block;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            transition: 0.2s;
+            color: #666;
+        }
+
+        .exp-item input:checked + label {
+            background: var(--bg-pure);
+            color: var(--primary);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        button {
+            width: 100%;
+            background: var(--action);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 15px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 0 #cc7000;
+        }
+
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #cc7000; }
+        button:active { transform: translateY(1px); box-shadow: 0 2px 0 #cc7000; }
+        button:disabled { background: #d1d5db; box-shadow: none; }
+
+        #status { text-align: center; margin-top: 20px; font-weight: 700; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="form-card">
+    <div class="header-section">
+        <div class="logo-box">
+            <img src="https://via.placeholder.com/200x50?text=ExamFriendly" alt="ExamFriendly Logo">
+        </div>
+        
+        <div class="course-badge">
+            <p>You are registering for:</p>
+            <h3 id="display_course_name">Python Programming</h3>
+            <p>Course ID: <span id="display_course_id">13f19019-c699-4259-bd54-f3ec52953a69</span></p>
+        </div>
+
+        <h2>Registration Details</h2>
+    </div>
+
+    <form id="mainForm">
+        <div class="form-grid">
+            <div class="group"><label>Parent Name</label><input type="text" id="parent_name" required></div>
+            <div class="group"><label>Parent Contact</label><input type="tel" id="parent_contact" required></div>
+            <div class="group"><label>Student Name</label><input type="text" id="student_name" required></div>
+            <div class="group"><label>Email Address</label><input type="email" id="student_email" required></div>
+            <div class="group"><label>WhatsApp No.</label><input type="tel" id="whatsapp_no" required></div>
+            <div class="group"><label>Student Age</label><input type="number" id="student_age" required></div>
+            <div class="group"><label>Student Grade</label><input type="text" id="student_grade" required></div>
+            <div class="group"><label>School Name</label><input type="text" id="school_name" required></div>
+
+            <div class="group full-width">
+                <label>Coding Experience Level</label>
+                <div class="exp-container">
+                    <div class="exp-item">
+                        <input type="radio" name="exp" id="b" value="Beginner" checked>
+                        <label for="b">Beginner</label>
+                    </div>
+                    <div class="exp-item">
+                        <input type="radio" name="exp" id="i" value="Intermediate">
+                        <label for="i">Intermediate</label>
+                    </div>
+                    <div class="exp-item">
+                        <input type="radio" name="exp" id="e" value="Expert">
+                        <label for="e">Expert</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group full-width">
+                <label>Referral Source</label>
+                <select id="referral">
+                    <option value="Instagram">Instagram</option>
+                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="Friend / Referral">Friend / Referral</option>
+                    <option value="Google Search">Google Search</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" id="submitBtn">Confirm Registration</button>
+        <div id="status"></div>
+    </form>
+</div>
+
+<script>
+    // Configuration
+    const _supabaseUrl = 'https://qomhhffaetgwjvifgcai.supabase.co';
+    const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvbWhoZmZhZXRnd2p2aWZnY2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMzY2NjQsImV4cCI6MjA4NjgxMjY2NH0.4Uf9enXmwlMEGZez8E9tNOzfh9AA74qcTUz15yfz1lQ'; 
+    const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseKey);
+
+    const form = document.getElementById('mainForm');
+    const msg = document.getElementById('status');
+    const btn = document.getElementById('submitBtn');
+
+    // Default Values for internal use
+    const COURSE_ID = "13f19019-c699-4259-bd54-f3ec52953a69";
+    const COURSE_NAME = "Python Programming";
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        btn.disabled = true;
+        btn.innerText = 'Submitting...';
+
+        const payload = {
+            parent_name: document.getElementById('parent_name').value,
+            parent_contact: document.getElementById('parent_contact').value,
+            student_name: document.getElementById('student_name').value,
+            student_email: document.getElementById('student_email').value,
+            whatsapp_no: document.getElementById('whatsapp_no').value,
+            student_age: document.getElementById('student_age').value,
+            student_grade: document.getElementById('student_grade').value,
+            school_name: document.getElementById('school_name').value,
+            coding_experience: document.querySelector('input[name="exp"]:checked').value,
+            referral_source: document.getElementById('referral').value,
+            course_id: COURSE_ID,
+            course_name: COURSE_NAME,
+            status: "new"
+        };
+
+        const { error: dbError } = await supabaseClient.from('income_registrations').insert([payload]);
+
+        if (dbError) {
+            msg.style.color = 'red';
+            msg.innerText = 'Submission Error: ' + dbError.message;
+            btn.disabled = false;
+            return;
+        }
+
+        // Trigger Email
+        await supabaseClient.functions.invoke('send-registration-email', { body: payload });
+
+        msg.style.color = 'var(--primary)';
+        msg.innerText = 'Success! You are now registered.';
+        form.reset();
+        btn.disabled = false;
+        btn.innerText = 'Confirm Registration';
+    });
+</script>
+
+</body>
+</html>

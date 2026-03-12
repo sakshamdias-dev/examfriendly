@@ -3,11 +3,10 @@ class ExamNavbar extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
     }
+
     connectedCallback() {
-        // 1. Check logic: Manual preference > System preference > Default light
         const savedTheme = localStorage.getItem('theme');
         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
         const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
 
         if (initialTheme === 'dark') {
@@ -20,12 +19,45 @@ class ExamNavbar extends HTMLElement {
         this.setupEventListeners();
     }
 
+    // New: Centralized navigation logic
+    handleNavigation(e) {
+        const target = e.composedPath().find(el => el.tagName === 'A');
+        if (target && target.hasAttribute('href')) {
+            const href = target.getAttribute('href');
+            
+            // Only intercept internal links (not absolute URLs like http://...)
+            if (!href.startsWith('http') && !href.startsWith('//')) {
+                e.preventDefault();
+                
+                // Update URL bar without reload
+                window.history.pushState({}, '', href);
+                
+                // Close mobile menu if open
+                const menu = this.shadowRoot.getElementById('mobile-menu');
+                const overlay = this.shadowRoot.getElementById('mobile-menu-overlay');
+                if(menu.classList.contains('active')) {
+                    menu.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+
+                // Dispatch a global event so your main page knows to change content
+                window.dispatchEvent(new CustomEvent('onroutechange', { detail: { path: href } }));
+            }
+        }
+    }
+
     setupEventListeners() {
-        const overlay = this.shadowRoot.getElementById('mobile-menu-overlay');
-        const menu = this.shadowRoot.getElementById('mobile-menu');
-        const themeBtn = this.shadowRoot.getElementById('theme-toggle');
-        const openBtn = this.shadowRoot.getElementById('open-menu-btn');
-        const closeBtn = this.shadowRoot.getElementById('close-menu-btn');
+        const shadow = this.shadowRoot;
+        const overlay = shadow.getElementById('mobile-menu-overlay');
+        const menu = shadow.getElementById('mobile-menu');
+        const themeBtn = shadow.getElementById('theme-toggle');
+        const openBtn = shadow.getElementById('open-menu-btn');
+        const closeBtn = shadow.getElementById('close-menu-btn');
+
+        // Listen for clicks on the nav containers (Delegation)
+        shadow.querySelector('.desktop-nav').onclick = (e) => this.handleNavigation(e);
+        shadow.querySelector('.mobile-links').onclick = (e) => this.handleNavigation(e);
 
         const toggleMenu = (isOpen) => {
             if (isOpen) {
@@ -48,7 +80,7 @@ class ExamNavbar extends HTMLElement {
                 const isDark = document.documentElement.classList.toggle('dark');
                 localStorage.setItem('theme', isDark ? 'dark' : 'light');
                 this.render();
-                this.setupEventListeners();
+                this.setupEventListeners(); // Re-bind after re-render
             };
         }
     }
@@ -109,26 +141,18 @@ class ExamNavbar extends HTMLElement {
             }
 
             .logo img { height: 42px; transition: transform 0.3s ease; position: relative; z-index: 2;}
-            .logo img:hover { transform: scale(1.05); }
 
-            /* --- DESKTOP NAVIGATION (Underline Removed) --- */
             nav.desktop-nav { 
                 display: flex; gap: 28px; 
                 position: absolute; left: 50%; transform: translateX(-50%);
             }
             
             nav.desktop-nav a { 
-                text-decoration: none; 
-                font-size: 14px; 
-                font-weight: 700; 
-                color: var(--text);
-                transition: color 0.3s ease; /* Smooth color change only */
-                position: relative;
+                text-decoration: none; font-size: 14px; font-weight: 700; color: var(--text);
+                transition: color 0.3s ease;
             }
             
-            nav.desktop-nav a:hover { 
-                color: var(--primary); 
-            }
+            nav.desktop-nav a:hover { color: var(--primary); }
 
             .mobile-toggle { display: none !important; }
 
@@ -140,10 +164,8 @@ class ExamNavbar extends HTMLElement {
             .icon-btn { 
                 background: none; border: none; cursor: pointer; color: var(--text); 
                 padding: 10px; border-radius: 50%; display: flex; align-items: center;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                position: relative; z-index: 2;
+                transition: all 0.3s ease; position: relative; z-index: 2;
             }
-            .icon-btn:hover { background: rgba(0, 191, 255, 0.15); color: var(--primary); }
 
             #mobile-menu-overlay {
                 position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
@@ -157,7 +179,6 @@ class ExamNavbar extends HTMLElement {
                 background: ${isDark ? '#0a0f1c' : '#ffffff'};
                 transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
                 z-index: 2001; padding: 30px 24px; border-left: 1px solid var(--border);
-                box-shadow: -10px 0 30px rgba(0,0,0,0.1);
             }
             #mobile-menu.active { transform: translateX(0); }
 
@@ -169,16 +190,12 @@ class ExamNavbar extends HTMLElement {
                 opacity: 0; transform: translateY(20px);
             }
 
-            #mobile-menu.active .mobile-links a {
-                animation: slideInUp 0.5s ease forwards;
-            }
+            #mobile-menu.active .mobile-links a { animation: slideInUp 0.5s ease forwards; }
             #mobile-menu.active .mobile-links a:nth-child(1) { animation-delay: 0.1s; }
             #mobile-menu.active .mobile-links a:nth-child(2) { animation-delay: 0.2s; }
             #mobile-menu.active .mobile-links a:nth-child(3) { animation-delay: 0.3s; }
             #mobile-menu.active .mobile-links a:nth-child(4) { animation-delay: 0.4s; }
             #mobile-menu.active .mobile-links a:nth-child(5) { animation-delay: 0.5s; }
-
-            .mobile-links a:hover { background: rgba(0, 191, 255, 0.1); color: var(--primary); }
 
             .bottom-line {
                 position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
@@ -193,16 +210,15 @@ class ExamNavbar extends HTMLElement {
                 <div class="logo"><img src="Artboard 1.png" alt="Logo"></div>
                 
                 <nav class="desktop-nav">
-                    <a href="index">Home</a>
-                    <a href="courses">Courses</a>
-                    <a href="studentsResource">Student Resources</a>
-                    <a href="aboutus">About Us</a>
-                    <a href="paperPilelauncher">Paper Pile Test Gen</a>
-                    
+                    <a href="/">Home</a>
+                    <a href="/courses">Courses</a>
+                    <a href="/studentsResource">Student Resources</a>
+                    <a href="/aboutus">About Us</a>
+                    <a href="/paperPilelauncher">Paper Pile Test Gen</a>
                 </nav>
 
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
+                    <button id="theme-toggle" class="icon-btn">
                         <span class="material-symbols-outlined">${isDark ? 'light_mode' : 'dark_mode'}</span>
                     </button>
                     <button id="open-menu-btn" class="icon-btn mobile-toggle">
@@ -215,17 +231,17 @@ class ExamNavbar extends HTMLElement {
         <div id="mobile-menu-overlay"></div>
         <div id="mobile-menu">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-weight: 800; color: var(--primary); font-size: 1.2rem; letter-spacing: -0.5px;">Navigation</span>
+                <span style="font-weight: 800; color: var(--primary); font-size: 1.2rem;">Navigation</span>
                 <button id="close-menu-btn" class="icon-btn">
                     <span class="material-icons">close</span>
                 </button>
             </div>
             <nav class="mobile-links">
-                <a href="index">Home</a>
-                <a href="courses">Courses</a>
-                <a href="studentsResource">Resources</a>
-                <a href="paperPilelauncher">Test Gen</a>
-                <a href="aboutus">About Us</a>
+                <a href="/">Home</a>
+                <a href="/courses">Courses</a>
+                <a href="/studentsResource">Resources</a>
+                <a href="/paperPilelauncher">Test Gen</a>
+                <a href="/aboutus">About Us</a>
             </nav>
         </div>
         `;

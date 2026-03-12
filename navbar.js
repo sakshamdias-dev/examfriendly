@@ -193,11 +193,11 @@ class ExamNavbar extends HTMLElement {
                 <div class="logo"><img src="Artboard 1.png" alt="Logo"></div>
                 
                 <nav class="desktop-nav">
-                    <a href="index.html">Home</a>
-                    <a href="courses.html">Courses</a>
-                    <a href="studentsResource.html">Student Resources</a>
-                    <a href="aboutus.html">About Us</a>
-                    <a href="paperPilelauncher.html">Paper Pile Test Gen</a>
+                    <a href="index">Home</a>
+                    <a href="courses">Courses</a>
+                    <a href="studentsResource">Student Resources</a>
+                    <a href="aboutus">About Us</a>
+                    <a href="paperPilelauncher">Paper Pile Test Gen</a>
                     
                 </nav>
 
@@ -221,11 +221,11 @@ class ExamNavbar extends HTMLElement {
                 </button>
             </div>
             <nav class="mobile-links">
-                <a href="index.html">Home</a>
-                <a href="courses.html">Courses</a>
-                <a href="studentsResource.html">Resources</a>
-                <a href="paperPilelauncher.html">Test Gen</a>
-                <a href="aboutus.html">About Us</a>
+                <a href="index">Home</a>
+                <a href="courses">Courses</a>
+                <a href="studentsResource">Resources</a>
+                <a href="paperPilelauncher">Test Gen</a>
+                <a href="aboutus">About Us</a>
             </nav>
         </div>
         `;

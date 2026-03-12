@@ -271,11 +271,10 @@
       <div class="relative overflow-hidden rounded-lg bg-white aspect-video">
         
         <div id="slider" class="flex transition-transform duration-500 ease-out h-full">
-          <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover flex-shrink-0" alt="Slide 1">
-          <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover flex-shrink-0" alt="Slide 2">
-          <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover flex-shrink-0" alt="Slide 3">
-          <img src="https://images.unsplash.com/photo-1587620962725-abab7fe55159?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover flex-shrink-0" alt="Slide 4">
-          <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover flex-shrink-0" alt="Slide 5">
+          <img src="https://qomhhffaetgwjvifgcai.supabase.co/storage/v1/object/public/slider/1.png" class="w-full h-full object-cover flex-shrink-0" alt="Slide 1">
+          <img src="https://qomhhffaetgwjvifgcai.supabase.co/storage/v1/object/public/slider/2.png" class="w-full h-full object-cover flex-shrink-0" alt="Slide 2">
+          <img src="https://qomhhffaetgwjvifgcai.supabase.co/storage/v1/object/public/slider/3.png" class="w-full h-full object-cover flex-shrink-0" alt="Slide 3">
+          <img src="https://qomhhffaetgwjvifgcai.supabase.co/storage/v1/object/public/slider/4.png" class="w-full h-full object-cover flex-shrink-0" alt="Slide 4">
         </div>
 
         <div class="absolute inset-0 flex items-center justify-between p-4">
@@ -304,7 +303,7 @@
 <script>
   let currentSlide = 0;
   const slider = document.getElementById('slider');
-  const totalSlides = 5;
+  const totalSlides = 4;
 
   function updateSlider() {
     slider.style.transform = `translateX(-${currentSlide * 100}%)`;

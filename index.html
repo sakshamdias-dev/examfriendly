@@ -27,6 +27,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="theme.js"></script>
     <script src ="navbar.js"></script>
+    <script src="footer.js"></script>
    
 <style>
     /* Custom Deep Sky Blue Pagination */
@@ -276,19 +277,6 @@
           <img src="https://qomhhffaetgwjvifgcai.supabase.co/storage/v1/object/public/slider/3.png" class="w-full h-full object-cover flex-shrink-0" alt="Slide 3">
           <img src="https://qomhhffaetgwjvifgcai.supabase.co/storage/v1/object/public/slider/4.png" class="w-full h-full object-cover flex-shrink-0" alt="Slide 4">
         </div>
-
-        <div class="absolute inset-0 flex items-center justify-between p-4">
-          <button onclick="prevSlide()" class="p-2 rounded-full bg-orange-500 hover:bg-orange-600 text-white shadow-lg transition-all transform hover:scale-110 active:scale-95">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <button onclick="nextSlide()" class="p-2 rounded-full bg-orange-500 hover:bg-orange-600 text-white shadow-lg transition-all transform hover:scale-110 active:scale-95">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
       </div>
     </div>
 
@@ -489,107 +477,21 @@
                                 are already excelling with Examfriendly. Book a personalized demo today.</p>
                         </div>
                         <div class="lg:w-1/3 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                            <button
-                                class="w-full sm:w-auto px-8 py-4 bg-white text-primary font-bold rounded-xl hover:bg-slate-50 transition-colors whitespace-nowrap">
-                                Book a Demo
+                            <button 
+                                class="w-full sm:w-auto px-8 py-4 bg-white text-primary font-bold rounded-xl hover:bg-slate-50 transition-colors whitespace-nowrap" >
+                               <a href="/courses.html">View Courses </a>
                             </button>
-                            <button
-                                class="w-full sm:w-auto px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white/10 transition-colors whitespace-nowrap">
-                                Contact Sales
+                            <button 
+                                class="w-full sm:w-auto px-8 py-4 bg-white text-primary font-bold rounded-xl hover:bg-slate-50 transition-colors whitespace-nowrap" >
+                               <a href="mailto:inquiry@examfriendly.in">Contact Team </a>
                             </button>
+
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <section class="py-20 lg:py-24 bg-slate-50 dark:bg-slate-900/50 transition-colors duration-300">
-            <div class="max-w-3xl mx-auto px-4 text-center">
-                <h2 class="text-2xl font-bold mb-4 text-slate-900 dark:text-white">Stay updated with Examfriendly</h2>
-                <p class="text-slate-600 dark:text-slate-400 mb-8">Get the latest educational resources and course
-                    updates delivered straight to your inbox.</p>
-                <form class="flex flex-col sm:flex-row gap-2 max-w-lg mx-auto">
-                    <input
-                        class="flex-grow px-6 py-4 rounded-xl border border-slate-200 dark:border-slate-800 dark:bg-slate-950 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                        placeholder="Enter your email" type="email" />
-                    <button
-                        class="px-8 py-4 bg-primary text-white font-bold rounded-xl hover:brightness-110 transition-all shadow-lg shadow-primary/20"
-                        type="submit">Subscribe</button>
-                </form>
             </div>
         </section>
     </main>
-    <footer
-        class="bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 pt-16 pb-8 relative z-10 transition-colors duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-                <div class="space-y-6">
-                    <div class="flex items-center gap-2">
-                        <div
-                            class="w-8 h-8 bg-white dark:bg-slate-800 border border-primary rounded-md flex items-center justify-center">
-                            <span class="material-symbols-outlined text-primary text-lg">school</span>
-                        </div>
-                        <span
-                            class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Examfriendly</span>
-                    </div>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                        Leading the future of digital education with accessible, high-quality learning resources for
-                        students and teachers worldwide.
-                    </p>
-                    <div class="flex gap-4">
-                        <a class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
-                            href="https://linkedin.com/company/exam-friendly" target="_blank">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 382 382"> <path d="M347.445,0H34.555C15.471,0,0,15.471,0,34.555v312.889C0,366.529,15.471,382,34.555,382h312.889 C366.529,382,382,366.529,382,347.444V34.555C382,15.471,366.529,0,347.445,0z M118.207,329.844c0,5.554-4.502,10.056-10.056,10.056 H65.345c-5.554,0-10.056-4.502-10.056-10.056V150.403c0-5.554,4.502-10.056,10.056-10.056h42.806 c5.554,0,10.056,4.502,10.056,10.056V329.844z M86.748,123.432c-22.459,0-40.666-18.207-40.666-40.666S64.289,42.1,86.748,42.1 s40.666,18.207,40.666,40.666S109.208,123.432,86.748,123.432z M341.91,330.654c0,5.106-4.14,9.246-9.246,9.246H286.73 c-5.106,0-9.246-4.14-9.246-9.246v-84.168c0-12.556,3.683-55.021-32.813-55.021c-28.309,0-34.051,29.066-35.204,42.11v97.079 c0,5.106-4.139,9.246-9.246,9.246h-44.426c-5.106,0-9.246-4.14-9.246-9.246V149.593c0-5.106,4.14-9.246,9.246-9.246h44.426 c5.106,0,9.246,4.14,9.246,9.246v15.655c10.497-15.753,26.097-27.912,59.312-27.912c73.552,0,73.131,68.716,73.131,106.472 L341.91,330.654L341.91,330.654z">
-                            </path> 
-                        </svg>
-                    </svg>
-                        </a>
-                        <a class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
-                            href="https://www.instagram.com/examfriendly_tutorials/" target="_blank">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849s-.011 3.584-.069 4.849c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.849-.07c-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849s.012-3.584.07-4.849c.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.358-.2 6.78-2.618 6.98-6.98.058-1.28.072-1.689.072-4.948s-.014-3.667-.072-4.947c-.2-4.358-2.618-6.78-6.98-6.98-1.28-.058-1.689-.072-4.948-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z">
-                                </path>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-6 text-slate-900 dark:text-white">Programs</h4>
-                    <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
-                        <li><a class="hover:text-primary transition-colors" href="#">CBSE Tutorials</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="#">NCERT Solutions</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="#">Coding Courses for kids</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="#">Maharashtra State Board Textbook Solutions</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-6 text-slate-900 dark:text-white">Support</h4>
-                    <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
-                        <li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="#">Terms of Service</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="#">Contact Us</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-6 text-slate-900 dark:text-white">Contact</h4>
-                    <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
-                        <li class="flex items-start gap-3">
-                            <span class="material-icons text-primary text-sm mt-1">location_on</span>
-                            <span>401201,Vasai West , Mumbai , Maharashtra </span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="material-icons text-primary text-sm">email</span>
-                            <span>inquiry@examfriendly.in</span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="material-icons text-primary text-sm">phone</span>
-                            <span>+91 70668 34012</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
 
 
 
@@ -625,8 +527,10 @@
     }
 });
 </script>
+<footer>
+<exam-footer></exam-footer>
+</footer>
 
-    </footer>
 
 </body>
 

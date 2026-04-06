@@ -197,7 +197,7 @@ class ExamNavbar extends HTMLElement {
                     <a href="courses">Courses</a>
                     <a href="studentsResource">Student Resources</a>
                     <a href="aboutus">About Us</a>
-                    <a href="https://examfriendly-exam.vercel.app">Examination</a>
+                    <a href="/exam">Examination</a>
                     
                 </nav>
 
@@ -224,7 +224,7 @@ class ExamNavbar extends HTMLElement {
                 <a href="index">Home</a>
                 <a href="courses">Courses</a>
                 <a href="studentsResource">Resources</a>
-                <a href="https://examfriendly-exam.vercel.app">Exam Centre</a>
+                <a href="/exam">Exam Centre</a>
                 <a href="aboutus">About Us</a>
             </nav>
         </div>

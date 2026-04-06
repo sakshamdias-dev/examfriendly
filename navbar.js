@@ -197,7 +197,7 @@ class ExamNavbar extends HTMLElement {
                     <a href="courses">Courses</a>
                     <a href="studentsResource">Student Resources</a>
                     <a href="aboutus">About Us</a>
-                    <a href="/exam">Examination</a>
+                    <a href="https://exam.examfriendly.in">Examination</a>
                     
                 </nav>
 
@@ -224,7 +224,7 @@ class ExamNavbar extends HTMLElement {
                 <a href="index">Home</a>
                 <a href="courses">Courses</a>
                 <a href="studentsResource">Resources</a>
-                <a href="/exam">Exam Centre</a>
+                <a href="https://exam.examfriendly.in">Exam Centre</a>
                 <a href="aboutus">About Us</a>
             </nav>
         </div>

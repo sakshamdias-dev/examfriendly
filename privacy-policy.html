@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+
+<head>
+    <script src="theme.js"></script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Privacy Policy | Examfriendly</title>
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <script src="examBot.js" type="module"></script>
+    <script src="navbar.js"></script>
+    <script src="footer.js"></script>
+
+    <style type="text/tailwindcss">
+        html, body { overscroll-behavior-y: none; }
+        :root { --deep-sky-blue: #00BFFF; --brand-orange: #FF8C00; }
+        @layer base {
+            .bg-deep-sky-blue { background-color: var(--deep-sky-blue); }
+            .text-deep-sky-blue { color: var(--deep-sky-blue); }
+            .bg-brand-orange { background-color: var(--brand-orange); }
+            .text-brand-orange { color: var(--brand-orange); }
+            .border-deep-sky-blue { border-color: var(--deep-sky-blue); }
+        }
+        @keyframes continuousWipe {
+            0% { transform: translateX(-150%); }
+            70% { transform: translateX(250%); }
+            100% { transform: translateX(250%); }
+        }
+        .navbar-wipe-v2 {
+            position: absolute; top: 0; left: 0; width: 76%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 191, 255, 0.22), transparent);
+            z-index: -1; animation: continuousWipe 13s linear infinite; animation-delay: 3s; filter: blur(14px);
+        }
+        @keyframes navLineGrow { 0% { transform: scaleX(0); } 100% { transform: scaleX(1); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes softFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes floatingSlow { 0%, 100% { transform: translate(0, 0); } 33% { transform: translate(15px, -15px); } 66% { transform: translate(-10px, 10px); } }
+        
+        .navbar-bottom-line {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--deep-sky-blue), transparent);
+            transform-origin: center; animation: navLineGrow 2.5s ease-out forwards;
+        }
+        .animate-fade-in-up { animation: fadeInUp 1s ease-out forwards; }
+        .animate-floating-slow { animation: floatingSlow 6s ease-in-out infinite; }
+    </style>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00BFFF",
+                        "accent": "#FF8C00",
+                        "background-light": "#FFFFFF",
+                        "background-dark": "#0A0F1C",
+                        "slate-950": "#020617",
+                    },
+                    fontFamily: { "display": ["Lexend", "sans-serif"] },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="font-display pt-24 bg-white text-slate-900 dark:bg-slate-950 dark:text-white antialiased overflow-x-hidden">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-20 left-[10%] w-4 h-4 bg-primary opacity-20 rounded-full animate-floating-slow"></div>
+        <div class="absolute top-40 right-[15%] w-3 h-3 bg-accent opacity-20 rounded-full animate-floating-slow" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-40 left-[5%] w-6 h-6 border-2 border-primary opacity-10 rounded-full animate-floating-slow" style="animation-delay: 2s;"></div>
+    </div>
+
+    <header class="relative z-[100]">
+        <exam-navbar></exam-navbar>
+    </header>
+
+    <main class="w-full flex flex-col items-center py-12 px-6 space-y-10">
+        <h2 class="text-[#00bfff] text-3xl font-bold border-b-4 border-current pb-2">Privacy Policy</h2>
+        
+        <div class="relative max-w-5xl mx-auto px-4 py-12">
+            <div class="absolute inset-0 z-0 hidden dark:block 
+                        bg-white/[0.03] backdrop-blur-xl rounded-[2rem] 
+                        border border-white/[0.05] shadow-[0_0_50px_-12px_rgba(141,247,240,0.2)]">
+            </div>
+
+            <div class="relative z-10 block mx-auto max-w-4xl px-5 text-slate-700 dark:text-[#B0AEAE] text-[1rem] font-regular leading-relaxed text-justify">
+                <p class="text-red-500 font-semibold mb-6">Last Updated : 16 April 2026</p>
+
+                <p class="mb-4">At <b>EXAMFRIENDLY</b>, we are committed to protecting the privacy and security of our students, parents, and educators. This Privacy Policy explains how we collect, use, and safeguard your information when you visit our website and use our teaching-learning tools and online tuition services.</p>
+
+                <div class="space-y-6">
+                    <section>
+                        <h3 class="text-xl font-bold text-primary mb-2">1. Information We Collect</h3>
+                        <ol class="list-[upper-alpha] pl-6 space-y-4">
+                            <li>
+                                <b>Personal Information</b>
+                                <ul class="list-disc pl-6 mt-2">
+                                    <li><b>Registration Data:</b> Name, email address, phone number, and age (specifically to identify student/parent roles).</li>
+                                    <li><b>Payment Information:</b> For non-academic courses and tuition fees (processed via secure third-party gateways).</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <b>Device And Technological Permissions</b>
+                                <p class="italic text-sm my-1">To ensure our teaching tools function correctly, we request the following:</p>
+                                <ul class="list-disc pl-6 mt-2">
+                                    <li><b>Location:</b> To comply with regional educational regulations and suggest local tuition timings.</li>
+                                    <li><b>Storage:</b> To allow students to download study materials and upload assignments or project files.</li>
+                                    <li><b>Cookies:</b> To remember login sessions, track progress in courses, and analyze website traffic.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xl font-bold text-primary mb-2">2. How We Use Your Information</h3>
+                        <ul class="list-disc pl-6">
+                            <li><b>Service Delivery:</b> To provide online tuitions and access to academic/non-academic resources.</li>
+                            <li><b>Personalization:</b> Tailoring learning tools to the student’s grade level or interest.</li>
+                            <li><b>Communication:</b> Sending updates regarding class schedules or resources.</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xl font-bold text-primary mb-2">3. Data Protection & Children's Privacy</h3>
+                        <p>As an EdTech company providing services to children, we take extra precautions. We encourage parental oversight and do not sell student data to third-party advertisers. All online tuition environments are moderated to ensure safety.</p>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xl font-bold text-primary mb-2">4. Your Rights</h3>
+                        <p>You have the right to access your data, request deletion of your account, or withdraw device permissions (Location/Storage) at any time via your device settings.</p>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xl font-bold text-primary mb-2">5. Contact Us</h3>
+                        <p>If you have any questions about this Privacy Policy, please contact us at: <b>info@examfriendly.in</b></p>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <exam-footer></exam-footer>
+    </footer>
+</body>
+</html>

@@ -136,22 +136,26 @@ class ExamFooter extends HTMLElement {
                     <div>
                         <h4>Support</h4>
                         <ul class="space-y-4">
-                            <li><a href="#">Privacy Policy</a></li>
-                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="/privacy-policy">Privacy Policy</a></li>
+                            <li><a href="/terms-of-service">Terms of Service</a></li>
                             <li><a href="/aboutus"> About Us </a></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4>Contact Us</h4>
-                        <ul class="space-y-4 text-sm">
+                        <ul class="space-y-5 text-sm">
                             <li class="flex items-start gap-3">
                                 <span class="material-icons">location_on</span>
-                                <span>401201, Vasai West, Mumbai, Maharashtra</span>
+                                <span>Michael Dias Marg , Karadi , Vasai West 401201</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="material-icons">verified</span>
+                                <span>UDYAM-MH-0233893</span>
                             </li>
                             <li class="flex items-center gap-3">
                                 <span class="material-icons">email</span>
-                                <span>inquiry@examfriendly.in</span>
+                                <span>info@examfriendly.in</span>
                             </li>
                             <li class="flex items-center gap-3">
                                 <span class="material-icons">phone</span>

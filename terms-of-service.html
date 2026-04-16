@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+
+<head>
+    <script src="theme.js"></script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Terms of Service | Examfriendly</title>
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <script src="examBot.js" type="module"></script>
+    <script src="navbar.js"></script>
+    <script src="footer.js"></script>
+
+    <style type="text/tailwindcss">
+        html, body { overscroll-behavior-y: none; }
+        :root { --deep-sky-blue: #00BFFF; --brand-orange: #FF8C00; }
+        @layer base {
+            .bg-deep-sky-blue { background-color: var(--deep-sky-blue); }
+            .text-deep-sky-blue { color: var(--deep-sky-blue); }
+            .bg-brand-orange { background-color: var(--brand-orange); }
+            .text-brand-orange { color: var(--brand-orange); }
+            .border-deep-sky-blue { border-color: var(--deep-sky-blue); }
+        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes floatingSlow { 0%, 100% { transform: translate(0, 0); } 33% { transform: translate(15px, -15px); } 66% { transform: translate(-10px, 10px); } }
+        
+        .animate-fade-in-up { animation: fadeInUp 1s ease-out forwards; }
+        .animate-floating-slow { animation: floatingSlow 6s ease-in-out infinite; }
+    </style>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00BFFF",
+                        "accent": "#FF8C00",
+                        "slate-950": "#020617",
+                    },
+                    fontFamily: { "display": ["Lexend", "sans-serif"] },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="font-display pt-24 bg-white text-slate-900 dark:bg-slate-950 dark:text-white antialiased overflow-x-hidden">
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-20 left-[10%] w-4 h-4 bg-primary opacity-20 rounded-full animate-floating-slow"></div>
+        <div class="absolute bottom-40 left-[5%] w-6 h-6 border-2 border-primary opacity-10 rounded-full animate-floating-slow" style="animation-delay: 2s;"></div>
+    </div>
+
+    <header class="relative z-[100]">
+        <exam-navbar></exam-navbar>
+    </header>
+
+    <main class="w-full flex flex-col items-center py-12 px-6 space-y-10">
+        <h2 class="text-[#00bfff] text-3xl font-bold border-b-4 border-current pb-2">Terms of Service</h2>
+        
+        <div class="relative max-w-5xl mx-auto px-4 py-12">
+            <div class="absolute inset-0 z-0 hidden dark:block 
+                        bg-white/[0.03] backdrop-blur-xl rounded-[2rem] 
+                        border border-white/[0.05] shadow-[0_0_50px_-12px_rgba(141,247,240,0.2)]">
+            </div>
+
+            <div class="relative z-10 block mx-auto max-w-4xl px-5 text-slate-700 dark:text-[#B0AEAE] text-[1rem] font-regular leading-relaxed text-justify">
+                <p class="text-red-500 font-semibold mb-6">Last Updated : 02 April 2026</p>
+
+                <p class="mb-4 text-lg">Welcome to <b>EXAMFRIENDLY</b>. By accessing our website and utilizing our online tuitions or teaching tools, you agree to comply with and be bound by the following terms.</p>
+
+                <div class="space-y-8">
+                    <section>
+                        <h3 class="text-xl font-bold text-primary mb-2">1. Acceptance of Terms</h3>
+                        <p>By using the EXAMFRIENDLY platform, you confirm that you are at least 18 years of age or are accessing the platform under the supervision of a parent or guardian who agrees to these terms.</p>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xl font-bold text-primary mb-2">2. Usage of Learning Tools</h3>
+                        <p>Our platform provides various teaching-learning resources. You agree to use these tools for personal, educational purposes only. Unauthorized redistribution, copying, or commercial use of our proprietary tools and materials is strictly prohibited.</p>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xl font-bold text-primary mb-2">3. Tuition & Course Enrollment</h3>
+                        <ul class="list-disc pl-6 space-y-2 mt-2">
+                            <li><b>Attendance:</b> Students are expected to join online tuition sessions on time.</li>
+                            <li><b>Conduct:</b> Any form of harassment, bullying, or disruption during live sessions will result in immediate suspension without refund.</li>
+                            <li><b>Non-Academic Courses:</b> Access to non-academic resources is provided for the duration specified at the time of purchase.</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xl font-bold text-primary mb-2">4. Fees & Refunds</h3>
+                        <p>Fees for tuition and non-academic courses must be paid in advance. Refund requests are subject to our refund policy, typically requiring notice 48 hours prior to the start of a course module.</p>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xl font-bold text-primary mb-2">5. User Permissions</h3>
+                        <p>Our tools require <b>Storage</b> and <b>Location</b> permissions to function (e.g., saving certificates, uploading assignments, or region-specific content). By using these tools, you grant EXAMFRIENDLY the right to access these features solely for functional purposes.</p>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xl font-bold text-primary mb-2">6. Limitation of Liability</h3>
+                        <p>EXAMFRIENDLY strives for 100% platform uptime and educational accuracy, but we do not guarantee that the services will be error-free or uninterrupted. We are not liable for any indirect damages resulting from the use of our tools.</p>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xl font-bold text-primary mb-2">7. Modifications</h3>
+                        <p>We reserve the right to modify these terms at any time. Continued use of the platform after changes implies acceptance of the new terms.</p>
+                    </section>
+                </div>
+
+                <div class="mt-10 p-6 border-t border-primary/20 text-center">
+                    <p>Have questions regarding our Terms? Contact us at <span class="text-primary font-bold">info@examfriendly.com</span></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <exam-footer></exam-footer>
+    </footer>
+</body>
+</html>

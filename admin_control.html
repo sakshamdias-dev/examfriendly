@@ -26,6 +26,109 @@
     </script>
     <style>
         body { font-family: 'Lexend', sans-serif; }
+        .admin-login-screen {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            background:
+                radial-gradient(circle at top left, rgb(0 191 255 / 0.16), transparent 34rem),
+                linear-gradient(135deg, #f8fbff 0%, #eef8ff 46%, #fff8ed 100%);
+            padding: 1.5rem;
+        }
+        .admin-login-card {
+            width: min(100%, 460px);
+            position: relative;
+            overflow: hidden;
+            background: rgb(255 255 255 / 0.92);
+            border: 1px solid rgb(0 191 255 / 0.16);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 28px 80px rgb(15 23 42 / 0.16);
+            backdrop-filter: blur(18px);
+        }
+        .admin-login-card::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto;
+            height: 0.4rem;
+            background: linear-gradient(90deg, #00BFFF, #FFA500);
+        }
+        .admin-login-header {
+            border-radius: 1.25rem;
+            background: linear-gradient(135deg, rgb(0 191 255 / 0.12), rgb(255 165 0 / 0.12));
+            border: 1px solid rgb(226 232 240 / 0.9);
+            padding: 1.75rem 1.25rem;
+        }
+        .admin-login-icon {
+            width: 4.5rem;
+            height: 4.5rem;
+            margin: 0 auto 1.1rem;
+            border-radius: 9999px;
+            display: grid;
+            place-items: center;
+            color: #00BFFF;
+            background: #ffffff;
+            border: 1px solid rgb(0 191 255 / 0.22);
+            box-shadow: 0 12px 30px rgb(0 191 255 / 0.18);
+        }
+        .admin-login-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            color: #64748b;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .admin-login-status::before {
+            content: '';
+            width: 0.55rem;
+            height: 0.55rem;
+            border-radius: 9999px;
+            background: #FFA500;
+            box-shadow: 0 0 0 0.25rem rgb(255 165 0 / 0.15);
+        }
+        .admin-login-field {
+            width: 100%;
+            border: 1px solid #dbe4ee;
+            border-radius: 0.85rem;
+            padding: 0.95rem 1rem;
+            color: #111827;
+            background: #ffffff;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .admin-login-field:focus {
+            border-color: #00BFFF;
+            box-shadow: 0 0 0 4px rgb(0 191 255 / 0.12);
+        }
+        .admin-login-button {
+            width: 100%;
+            border: 0;
+            border-radius: 0.9rem;
+            background: linear-gradient(135deg, #00BFFF, #18aeea);
+            color: #ffffff;
+            font-weight: 800;
+            padding: 1rem;
+            box-shadow: 0 16px 34px rgb(0 191 255 / 0.24);
+            transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+        }
+        .admin-login-button:hover {
+            filter: brightness(1.04);
+            box-shadow: 0 18px 38px rgb(0 191 255 / 0.3);
+        }
+        .admin-login-button:active { transform: scale(0.99); }
+        .admin-login-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .admin-login-note {
+            border-radius: 1rem;
+            background: #f8fafc;
+            border: 1px solid #edf2f7;
+            padding: 1rem;
+        }
         .modern-input {
             width: 100%;
             background: #fff;
@@ -74,7 +177,68 @@
 </head>
 <body class="bg-[#f6f6f8] dark:bg-[#101622] text-slate-900 dark:text-slate-100">
 
-<div class="flex min-h-screen">
+<section id="admin-login-screen" class="min-h-screen flex items-center justify-center bg-[#f6f6f8] dark:bg-[#101622] px-4">
+    
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6">
+
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <div class="w-14 h-14 mx-auto rounded-xl bg-primary/10 flex items-center justify-center mb-3">
+                <span class="material-symbols-outlined text-primary text-[28px]">
+                    admin_panel_settings
+                </span>
+            </div>
+
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">
+                Examfriendly
+            </h1>
+
+            <p class="text-sm text-slate-500 mt-1">
+                Admin Access Panel
+            </p>
+        </div>
+
+        <!-- Form -->
+        <form id="admin-login-form" class="space-y-4">
+
+            <div>
+                <label class="text-xs font-bold uppercase text-slate-400">
+                    Email
+                </label>
+                <input id="admin-email" type="email"
+                    class="modern-input mt-1"
+                    placeholder="email@example.com"
+                    required>
+            </div>
+
+            <div>
+                <label class="text-xs font-bold uppercase text-slate-400">
+                    Password
+                </label>
+                <input id="admin-password" type="password"
+                    class="modern-input mt-1"
+                    placeholder="••••••••"
+                    required>
+            </div>
+
+            <p id="admin-login-error"
+                class="hidden text-xs text-red-500 font-semibold"></p>
+
+            <button id="admin-login-button"
+                class="w-full bg-primary text-white py-3 rounded-xl font-bold text-sm hover:brightness-110 active:scale-[0.98] transition">
+                Sign In
+            </button>
+        </form>
+
+        <!-- Footer Note -->
+        <div class="mt-5 text-center text-xs text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-4">
+            Authorized admins only • Secured via Supabase
+        </div>
+
+    </div>
+</section>
+
+<div id="admin-shell" class="hidden flex min-h-screen">
     <aside class="w-72 overflow-y-auto bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-8">
         <h1 class="text-2xl font-bold text-primary">Examfriendly</h1>
         <nav class="flex flex-col gap-2 flex-1">
@@ -432,6 +596,104 @@ let currentToolEditingId = null;
 let courseCacheById = {};
 let contentCacheById = {};
 let toolCacheById = {};
+let adminDataLoaded = false;
+
+const adminLoginScreen = document.getElementById('admin-login-screen');
+const adminShell = document.getElementById('admin-shell');
+const adminLoginForm = document.getElementById('admin-login-form');
+const adminLoginButton = document.getElementById('admin-login-button');
+const adminLoginError = document.getElementById('admin-login-error');
+
+function setAdminLoginError(message = '') {
+    adminLoginError.textContent = message;
+    adminLoginError.classList.toggle('hidden', !message);
+}
+
+function showLogin() {
+    adminShell.classList.add('hidden');
+    adminShell.classList.remove('flex');
+    adminLoginScreen.classList.remove('hidden');
+    adminLoginForm.reset();
+    setAdminLoginError('');
+}
+
+async function verifyAdminAccess(userId) {
+    const { data, error } = await supabaseClient
+        .from('admin_users')
+        .select('id, is_active')
+        .eq('id', userId)
+        .eq('is_active', true)
+        .maybeSingle();
+
+    if (error) {
+        throw new Error('Admin access table is not ready. Create admin_users in Supabase first.');
+    }
+    if (!data) {
+        throw new Error('This account is not authorized for admin access.');
+    }
+}
+
+async function showAdminApp() {
+    adminLoginScreen.classList.add('hidden');
+    adminShell.classList.remove('hidden');
+    adminShell.classList.add('flex');
+
+    if (!adminDataLoaded) {
+        adminDataLoaded = true;
+        await Promise.all([
+            loadCourses(),
+            loadTools(),
+            loadRegistrations(),
+            loadContentManagerTable()
+        ]);
+    }
+}
+
+async function initializeAdminAuth() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) {
+        try {
+            await verifyAdminAccess(session.user.id);
+            await showAdminApp();
+        } catch (err) {
+            await supabaseClient.auth.signOut();
+            showLogin();
+            setAdminLoginError(err.message);
+        }
+    } else {
+        showLogin();
+    }
+}
+
+adminLoginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setAdminLoginError('');
+    adminLoginButton.disabled = true;
+    adminLoginButton.textContent = 'Signing in...';
+
+    const email = document.getElementById('admin-email').value.trim();
+    const password = document.getElementById('admin-password').value;
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    if (error) {
+        setAdminLoginError('Invalid admin email or password.');
+        adminLoginButton.disabled = false;
+        adminLoginButton.textContent = 'Sign In';
+        return;
+    }
+
+    try {
+        await verifyAdminAccess(data.user.id);
+        adminLoginButton.disabled = false;
+        adminLoginButton.textContent = 'Sign In';
+        await showAdminApp();
+    } catch (err) {
+        await supabaseClient.auth.signOut();
+        setAdminLoginError(err.message);
+        adminLoginButton.disabled = false;
+        adminLoginButton.textContent = 'Sign In';
+    }
+});
 
 function escapeHTML(value) {
     return String(value ?? '')
@@ -1336,7 +1598,10 @@ async function deletePDF(id) {
 }
 
 function handleLogout() {
-    window.location.href = 'index.html';
+    supabaseClient.auth.signOut().finally(() => {
+        adminDataLoaded = false;
+        showLogin();
+    });
 }
 
 function toggleIconType() {
@@ -1355,10 +1620,7 @@ function toggleIconType() {
 }
 
 // init
-loadCourses();
-loadTools();
-loadRegistrations();
-loadContentManagerTable();
+initializeAdminAuth();
 </script>
 </body>
 </html>

@@ -2,6 +2,13 @@ class ExamNavbar extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
+        this.navItems = [
+            { href: 'index', label: 'Home' },
+            { href: 'courses', label: 'Courses' },
+            { href: 'studentsResource', label: 'Student Resources' },
+            { href: 'tools', label: 'Tools' },
+            { href: 'aboutus', label: 'About Us' },
+        ];
     }
     connectedCallback() {
         // 1. Check logic: Manual preference > System preference > Default light
@@ -51,6 +58,29 @@ class ExamNavbar extends HTMLElement {
                 this.setupEventListeners();
             };
         }
+    }
+
+    normalizePath(path) {
+        return (path || '')
+            .replace(/^\/+/, '')
+            .replace(/\.html$/i, '')
+            .toLowerCase();
+    }
+
+    getCurrentPage() {
+        const currentPath = this.normalizePath(window.location.pathname);
+        return currentPath || 'index';
+    }
+
+    renderNavLinks(className) {
+        const currentPage = this.getCurrentPage();
+        return this.navItems
+            .map((item) => {
+                const itemPath = this.normalizePath(item.href);
+                const isActive = currentPage === itemPath;
+                return `<a href="${item.href}" class="${className}${isActive ? ' active' : ''}">${item.label}</a>`;
+            })
+            .join('');
     }
 
     render() {
@@ -129,6 +159,9 @@ class ExamNavbar extends HTMLElement {
             nav.desktop-nav a:hover { 
                 color: var(--primary); 
             }
+            nav.desktop-nav a.active {
+                color: var(--primary);
+            }
 
             .mobile-toggle { display: none !important; }
 
@@ -179,6 +212,10 @@ class ExamNavbar extends HTMLElement {
             #mobile-menu.active .mobile-links a:nth-child(5) { animation-delay: 0.5s; }
 
             .mobile-links a:hover { background: rgba(0, 191, 255, 0.1); color: var(--primary); }
+            .mobile-links a.active {
+                background: rgba(0, 191, 255, 0.1);
+                color: var(--primary);
+            }
 
             .bottom-line {
                 position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
@@ -193,12 +230,7 @@ class ExamNavbar extends HTMLElement {
                 <div class="logo"><img src="Artboard 1.png" alt="Logo"></div>
                 
                 <nav class="desktop-nav">
-                    <a href="index">Home</a>
-                    <a href="courses">Courses</a>
-                    <a href="studentsResource">Student Resources</a>
-                    <a href="aboutus">About Us</a>
-                    <a href="https://exam.examfriendly.in">Examination</a>
-                    
+                    ${this.renderNavLinks('desktop-link')}
                 </nav>
 
                 <div style="display: flex; gap: 8px; align-items: center;">
@@ -221,11 +253,7 @@ class ExamNavbar extends HTMLElement {
                 </button>
             </div>
             <nav class="mobile-links">
-                <a href="index">Home</a>
-                <a href="courses">Courses</a>
-                <a href="studentsResource">Resources</a>
-                <a href="https://exam.examfriendly.in">Exam Centre</a>
-                <a href="aboutus">About Us</a>
+                ${this.renderNavLinks('mobile-link')}
             </nav>
         </div>
         `;

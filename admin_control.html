@@ -11,7 +11,17 @@
     <script>
         tailwind.config = {
             darkMode: "class",
-            theme: { extend: { colors: { "primary": "#00BFFF", "secondary": "#FFA500" }, fontFamily: { "display": ["Lexend", "sans-serif"] } } }
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00BFFF",
+                        "secondary": "#FFA500"
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    }
+                }
+            }
         }
     </script>
     <style>
@@ -29,7 +39,7 @@
 <div class="flex h-screen overflow-hidden">
     <aside class="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-8">
         <h1 class="text-2xl font-bold text-primary">Examfriendly</h1>
-        <nav class="flex flex-col gap-2">
+        <nav class="flex flex-col gap-2 flex-1">
             <div onclick="switchTab('overview', this)" class="tab-btn flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary transition-all cursor-pointer">
                 <span class="material-symbols-outlined">dashboard</span>
                 <p class="text-sm font-semibold">Overview</p>
@@ -42,12 +52,36 @@
                 <span class="material-symbols-outlined">Receipt_Long</span>
                 <p class="text-sm font-medium">Registration Manager</p>
             </div>
+            <div onclick="switchTab('content', this)" class="tab-btn flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer">
+                <span class="material-symbols-outlined">Add_Box</span>
+                <p class="text-sm font-medium">Content Manager</p>
+            </div>
         </nav>
+
+        <button onclick="handleLogout()" class="flex items-center gap-2 border border-slate-200 dark:border-slate-700 px-5 py-2.5 rounded-xl font-semibold hover:bg-red-500 hover:text-white transition-all group">
+            <span class="material-symbols-outlined">logout</span>
+            <span>Sign Out</span>
+        </button>
     </aside>
 
     <main class="flex-1 overflow-y-auto">
         <div id="overview-panel" class="p-8">
             <h3 class="text-2xl font-bold">Welcome back, Admin!</h3>
+            <p class="text-slate-500 dark:text-slate-400 mt-2">Quick snapshot of platform activity.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+                    <p class="text-xs uppercase tracking-wide text-slate-400 font-semibold">Total Courses</p>
+                    <p id="overview-course-count" class="text-3xl font-black text-primary mt-2">0</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+                    <p class="text-xs uppercase tracking-wide text-slate-400 font-semibold">Total Registrations</p>
+                    <p id="overview-reg-count" class="text-3xl font-black text-secondary mt-2">0</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+                    <p class="text-xs uppercase tracking-wide text-slate-400 font-semibold">PDF Resources</p>
+                    <p id="overview-pdf-count" class="text-3xl font-black text-primary mt-2">0</p>
+                </div>
+            </div>
         </div>
 
         <div id="courses-manager-panel" class="hidden p-8">
@@ -89,12 +123,33 @@
                 </table>
             </div>
         </div>
+
+        <div id="content-manager-panel" class="hidden p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-bold">Content Manager</h3>
+                <button onclick="openContentModal()" class="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-primary/20">+ Add New</button>
+            </div>
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 dark:bg-slate-800/50">
+                        <tr>
+                            <th class="p-4 text-xs font-bold uppercase text-slate-500">Chapter</th>
+                            <th class="p-4 text-xs font-bold uppercase text-slate-500">Board</th>
+                            <th class="p-4 text-xs font-bold uppercase text-slate-500">Std</th>
+                            <th class="p-4 text-xs font-bold uppercase text-slate-500">Subject</th>
+                            <th class="p-4 text-xs font-bold uppercase text-slate-500">PDF</th>
+                            <th class="p-4 text-xs font-bold uppercase text-slate-500 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="content-table-body" class="divide-y dark:divide-slate-800"></tbody>
+                </table>
+            </div>
+        </div>
     </main>
 </div>
 
 <div id="course-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
-        
         <div id="modal-sidebar" class="w-full md:w-72 bg-slate-50 dark:bg-slate-800/50 p-8 border-r border-slate-100 dark:border-slate-800 flex flex-col justify-between">
             <div>
                 <h3 id="modal-title" class="text-xl font-bold text-slate-900 dark:text-white mb-2">Manage</h3>
@@ -106,7 +161,6 @@
                 </div>
             </div>
         </div>
-
         <div class="flex-1 flex flex-col overflow-hidden">
             <div id="modal-body" class="p-8 overflow-y-auto custom-scrollbar">
                 <form id="course-form" class="space-y-8">
@@ -116,7 +170,7 @@
                         <div class="space-y-2">
                             <label class="text-[10px] font-bold text-slate-400 uppercase">Course Thumbnail</label>
                             <input type="file" id="course-file" accept="image/*" class="modern-input cursor-pointer file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/80" onchange="handleFileSelect(this)">
-                            <input type="hidden" id="course-image-url"> 
+                            <input type="hidden" id="course-image-url">
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <input type="number" id="price" oninput="updatePreview()" class="modern-input" placeholder="Price (₹)">
@@ -156,9 +210,82 @@
 
             <div id="modal-footer" class="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-4">
                 <button type="button" onclick="closeModal()" class="px-6 py-2.5 text-sm font-bold text-slate-500">Discard</button>
-                <button id="publish-btn" form="course-form" type="submit" class="bg-primary text-white px-10 py-2.5 rounded-xl font-bold shadow-lg shadow-primary/30 active:scale-95">
-                    Publish Course
-                </button>
+                <button id="publish-btn" form="course-form" type="submit" class="bg-primary text-white px-10 py-2.5 rounded-xl font-bold shadow-lg shadow-primary/30 active:scale-95">Publish Course</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="content-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-4">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
+        <div class="w-full md:w-72 bg-slate-50 dark:bg-slate-800/50 p-8 border-r border-slate-100 dark:border-slate-800 flex flex-col justify-between">
+            <div>
+                <h3 id="content-modal-title" class="text-xl font-bold text-slate-900 dark:text-white mb-2">Add PDF Resource</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 leading-6">Pick board, standard and subject, then add a chapter.</p>
+                <div class="mt-6 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
+                    <p class="text-[10px] uppercase tracking-wide font-bold text-slate-400">Tip</p>
+                    <p class="text-xs mt-2 text-slate-600 dark:text-slate-300">Use the + buttons next to dropdowns to quickly add missing board, standard or subject.</p>
+                </div>
+            </div>
+        </div>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <div class="p-8 overflow-y-auto custom-scrollbar">
+                <form id="content-form" class="space-y-7">
+                    <div class="space-y-4">
+                        <label class="text-xs font-bold uppercase tracking-wider text-primary">Classification</label>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-400">Board</label>
+                        <div class="flex items-center gap-2">
+                            <select id="boardSelectAdmin" class="modern-input"></select>
+                            <button type="button" onclick="createTaxonomyItem('board')" class="h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 text-primary flex items-center justify-center hover:bg-primary/10 transition-all" title="Add new board" aria-label="Add new board">
+                                <span class="material-symbols-outlined text-[20px]">add</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-400">Standard</label>
+                        <div class="flex items-center gap-2">
+                            <select id="standardSelectAdmin" class="modern-input" disabled>
+                                <option value="">Select board first</option>
+                            </select>
+                            <button type="button" onclick="createTaxonomyItem('standard')" class="h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 text-primary flex items-center justify-center hover:bg-primary/10 transition-all" title="Add new standard" aria-label="Add new standard">
+                                <span class="material-symbols-outlined text-[20px]">add</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-slate-400">Subject</label>
+                        <div class="flex items-center gap-2">
+                            <select id="subjectSelectAdmin" class="modern-input" disabled>
+                                <option value="">Select standard first</option>
+                            </select>
+                            <button type="button" onclick="createTaxonomyItem('subject')" class="h-11 w-11 rounded-xl border border-slate-200 dark:border-slate-700 text-primary flex items-center justify-center hover:bg-primary/10 transition-all" title="Add new subject" aria-label="Add new subject">
+                                <span class="material-symbols-outlined text-[20px]">add</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="text-[10px] font-bold uppercase text-slate-400">New Chapter Name</label>
+                            <button type="button" onclick="prepareNewChapter()" class="text-xs font-bold text-primary">+ ADD NEW</button>
+                        </div>
+                        <input type="text" id="chapter-name" class="modern-input" placeholder="Chapter name" required>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-slate-400">PDF File</label>
+                        <input type="file" id="res-pdf" accept=".pdf" class="modern-input mt-2 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/80">
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" onclick="closeContentModal()" class="px-6 py-2.5 text-sm font-bold text-slate-500">Cancel</button>
+                        <button type="submit" id="save-content-btn" class="bg-primary text-white px-8 py-2.5 rounded-xl font-bold shadow-lg shadow-primary/20">Save PDF</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -170,6 +297,31 @@ const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseKey);
 
 let currentEditingId = null;
+let currentContentEditingId = null;
+let currentEditingPdfUrl = null;
+let courseCacheById = {};
+let contentCacheById = {};
+
+function escapeHTML(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function updateOverviewStats({ courses, registrations, pdfs }) {
+    if (typeof courses === 'number') {
+        document.getElementById('overview-course-count').innerText = String(courses);
+    }
+    if (typeof registrations === 'number') {
+        document.getElementById('overview-reg-count').innerText = String(registrations);
+    }
+    if (typeof pdfs === 'number') {
+        document.getElementById('overview-pdf-count').innerText = String(pdfs);
+    }
+}
 
 function switchTab(tabName, element) {
     document.querySelectorAll('.tab-btn').forEach(item => {
@@ -177,13 +329,15 @@ function switchTab(tabName, element) {
         item.classList.add('text-slate-600', 'dark:text-slate-400');
     });
     element.classList.add('bg-primary/10', 'text-primary');
-    
+
     document.getElementById('overview-panel').classList.toggle('hidden', tabName !== 'overview');
     document.getElementById('courses-manager-panel').classList.toggle('hidden', tabName !== 'courses');
     document.getElementById('reg-manager-panel').classList.toggle('hidden', tabName !== 'registration');
-    
+    document.getElementById('content-manager-panel').classList.toggle('hidden', tabName !== 'content');
+
     if (tabName === 'courses') loadCourses();
     if (tabName === 'registration') loadRegistrations();
+    if (tabName === 'content') loadContentManagerTable();
 }
 
 function handleFileSelect(input) {
@@ -217,9 +371,9 @@ function openModal(mode) {
     const publishBtn = document.getElementById('publish-btn');
     modal.classList.remove('hidden');
 
-    if(mode === 'course') {
-        document.getElementById('modal-title').innerText = currentEditingId ? "Edit Course" : "Create Course";
-        publishBtn.innerText = currentEditingId ? "Update Course" : "Publish Course";
+    if (mode === 'course') {
+        document.getElementById('modal-title').innerText = currentEditingId ? 'Edit Course' : 'Create Course';
+        publishBtn.innerText = currentEditingId ? 'Update Course' : 'Publish Course';
         form.classList.remove('hidden');
         studentList.classList.add('hidden');
         sidebar.classList.remove('hidden');
@@ -232,18 +386,18 @@ function openModal(mode) {
     }
 }
 
-function closeModal() { 
-    document.getElementById('course-modal').classList.add('hidden'); 
-    document.getElementById('course-form').reset(); 
-    document.getElementById('sections-container').innerHTML = ''; 
+function closeModal() {
+    document.getElementById('course-modal').classList.add('hidden');
+    document.getElementById('course-form').reset();
+    document.getElementById('sections-container').innerHTML = '';
     document.getElementById('preview-img').classList.add('hidden');
-    currentEditingId = null; 
-    updatePreview(); 
+    currentEditingId = null;
+    updatePreview();
 }
 
 function updatePreview() {
-    document.getElementById('preview-name').innerText = document.getElementById('course-name').value || "New Course Title";
-    document.getElementById('preview-price').innerText = "₹" + (document.getElementById('price').value || "0");
+    document.getElementById('preview-name').innerText = document.getElementById('course-name').value || 'New Course Title';
+    document.getElementById('preview-price').innerText = '₹' + (document.getElementById('price').value || '0');
 }
 
 function addSection(title = '', content = '') {
@@ -261,31 +415,44 @@ function addSection(title = '', content = '') {
 async function loadCourses() {
     const { data, error } = await supabaseClient.from('course_created').select('*').order('created_at', { ascending: false });
     if (error) return console.error(error);
-    document.getElementById('course-table-body').innerHTML = data.map(c => `
+    const rows = data || [];
+    courseCacheById = {};
+    rows.forEach(course => {
+        courseCacheById[course.id] = course;
+    });
+
+    document.getElementById('course-table-body').innerHTML = rows.map(c => `
         <tr class="border-b dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-            <td class="p-4 font-semibold">${c.name}</td>
-            <td class="p-4 text-secondary font-bold">₹${c.price}</td>
+            <td class="p-4 font-semibold">${escapeHTML(c.name)}</td>
+            <td class="p-4 text-secondary font-bold">₹${escapeHTML(c.price)}</td>
             <td class="p-4 text-right flex justify-end gap-2">
-                <button onclick='openEditModal(${JSON.stringify(c).replace(/'/g, "&apos;")})' class="text-primary hover:bg-primary/10 p-2 rounded-lg transition-all">
+                <button onclick="openEditModalById('${escapeHTML(c.id)}')" class="text-primary hover:bg-primary/10 p-2 rounded-lg transition-all">
                     <span class="material-symbols-outlined text-sm">edit</span>
                 </button>
-                <button onclick="deleteCourse('${c.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all">
+                <button onclick="deleteCourse('${escapeHTML(c.id)}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all">
                     <span class="material-symbols-outlined text-sm">delete</span>
                 </button>
             </td>
         </tr>`).join('');
+    updateOverviewStats({ courses: rows.length });
+}
+
+function openEditModalById(courseId) {
+    const course = courseCacheById[courseId];
+    if (!course) return;
+    openEditModal(course);
 }
 
 function openEditModal(course) {
     currentEditingId = course.id;
     openModal('course');
-    document.getElementById('course-name').value = course.name;
+    document.getElementById('course-name').value = course.name || '';
     document.getElementById('course-image-url').value = course.img_url || '';
-    if(course.img_url) {
+    if (course.img_url) {
         document.getElementById('preview-img').src = course.img_url;
         document.getElementById('preview-img').classList.remove('hidden');
     }
-    document.getElementById('price').value = course.price;
+    document.getElementById('price').value = course.price || '';
     document.getElementById('fee_type').value = course.fee_type || 'one-time';
     document.getElementById('course-deadline').value = course.reg_deadline || '';
     document.getElementById('course-entry').value = course.entry_size || '';
@@ -298,15 +465,12 @@ function openEditModal(course) {
     updatePreview();
 }
 
-// DELETE FIX: Cascade Deletion
 async function deleteCourse(id) {
-    if(confirm('Are you sure? This will also delete all student registrations for this course.')) {
+    if (confirm('Are you sure? This will also delete all student registrations for this course.')) {
         try {
-            // 1. Delete associated registrations first to avoid FK constraint error
             const { error: regError } = await supabaseClient.from('income_registrations').delete().eq('course_id', id);
             if (regError) throw regError;
 
-            // 2. Delete the course
             const { error: courseError } = await supabaseClient.from('course_created').delete().eq('id', id);
             if (courseError) throw courseError;
 
@@ -321,7 +485,7 @@ async function deleteCourse(id) {
 document.getElementById('course-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const saveBtn = e.submitter;
-    saveBtn.innerText = "Processing...";
+    saveBtn.innerText = 'Processing...';
     saveBtn.disabled = true;
 
     try {
@@ -330,10 +494,12 @@ document.getElementById('course-form').addEventListener('submit', async (e) => {
         if (fileInput.files.length > 0) {
             imgUrl = await uploadImage(fileInput.files[0]);
         }
+
         const sections = Array.from(document.querySelectorAll('.dynamic-section-card')).map(box => ({
             title: box.querySelector('.section-title').value,
             content: box.querySelector('.section-content').value
         }));
+
         const payload = {
             name: document.getElementById('course-name').value,
             price: parseFloat(document.getElementById('price').value) || 0,
@@ -344,40 +510,49 @@ document.getElementById('course-form').addEventListener('submit', async (e) => {
             entry_size: parseInt(document.getElementById('course-entry').value) || null,
             details: sections
         };
-        let result = currentEditingId ? await supabaseClient.from('course_created').update(payload).eq('id', currentEditingId) : await supabaseClient.from('course_created').insert([payload]);
+
+        const result = currentEditingId
+            ? await supabaseClient.from('course_created').update(payload).eq('id', currentEditingId)
+            : await supabaseClient.from('course_created').insert([payload]);
+
         if (result.error) throw result.error;
-        alert(currentEditingId ? "Course Updated!" : "Course Published!");
-        closeModal(); 
-        loadCourses(); 
+
+        alert(currentEditingId ? 'Course Updated!' : 'Course Published!');
+        closeModal();
+        loadCourses();
     } catch (err) {
-        alert("Operation failed: " + err.message);
+        alert('Operation failed: ' + err.message);
     } finally {
         saveBtn.disabled = false;
-        saveBtn.innerText = currentEditingId ? "Update Course" : "Publish Course";
+        saveBtn.innerText = currentEditingId ? 'Update Course' : 'Publish Course';
     }
 });
 
 async function loadRegistrations() {
     const { data, error } = await supabaseClient.from('course_created').select(`id, name, income_registrations (id)`);
     if (error) return console.error(error);
-    document.getElementById('reg-table-body').innerHTML = data.map(course => {
+    const rows = data || [];
+    const totalRegistrations = rows.reduce((sum, course) => sum + (course.income_registrations ? course.income_registrations.length : 0), 0);
+
+    document.getElementById('reg-table-body').innerHTML = rows.map(course => {
         const count = course.income_registrations ? course.income_registrations.length : 0;
         return `
         <tr class="border-b dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-            <td class="p-4 font-bold text-slate-800 dark:text-white">${course.name}</td>
+            <td class="p-4 font-bold text-slate-800 dark:text-white">${escapeHTML(course.name)}</td>
             <td class="p-4">
                 <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-black">${count} Entries</span>
             </td>
             <td class="p-4 text-right flex justify-end gap-2">
-                <button onclick="viewStudentDetails('${course.id}', '${course.name}')" class="bg-slate-100 dark:bg-slate-800 p-2 rounded-lg hover:text-primary transition-all">
+                <button onclick="viewStudentDetails('${escapeHTML(course.id)}', '${escapeHTML(course.name)}')" class="bg-slate-100 dark:bg-slate-800 p-2 rounded-lg hover:text-primary transition-all">
                     <span class="material-symbols-outlined text-sm">person_search</span>
                 </button>
-                <button onclick="exportToCSV('${course.id}', '${course.name}')" class="bg-slate-100 dark:bg-slate-800 p-2 rounded-lg hover:text-green-500 transition-all">
+                <button onclick="exportToCSV('${escapeHTML(course.id)}', '${escapeHTML(course.name)}')" class="bg-slate-100 dark:bg-slate-800 p-2 rounded-lg hover:text-green-500 transition-all">
                     <span class="material-symbols-outlined text-sm">download</span>
                 </button>
             </td>
         </tr>`;
     }).join('');
+    updateOverviewStats({ registrations: totalRegistrations });
 }
 
 async function viewStudentDetails(courseId, courseName) {
@@ -388,23 +563,23 @@ async function viewStudentDetails(courseId, courseName) {
     document.getElementById('student-search').value = '';
 
     const { data: students, error } = await supabaseClient.from('income_registrations').select('*').eq('course_id', courseId).order('created_at', { ascending: false });
-    if (error) return alert("Error fetching students");
+    if (error) return alert('Error fetching students');
 
-    window.currentStudents = students; // Store for filtering
-    renderStudentCards(students);
+    window.currentStudents = students || [];
+    renderStudentCards(students || []);
 }
 
 function renderStudentCards(students) {
     const container = document.getElementById('student-cards-grid');
     container.innerHTML = students.length ? students.map(s => `
         <div class="student-card bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-6 rounded-3xl shadow-sm space-y-5 relative overflow-hidden" 
-             data-search="${(s.student_name + s.parent_name + s.school_name).toLowerCase()}">
-            <div class="flex justify-between items-start">
+             data-search="${escapeHTML((String(s.student_name || '') + String(s.parent_name || '') + String(s.school_name || '')).toLowerCase())}">
+            <div class="flex justify-between items-start gap-3">
                 <div>
-                    <h4 class="font-bold text-xl text-slate-900 dark:text-white">${s.student_name}</h4>
-                    <p class="text-xs text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">mail</span> ${s.student_email}</p>
+                    <h4 class="font-bold text-xl text-slate-900 dark:text-white">${escapeHTML(s.student_name || 'N/A')}</h4>
+                    <p class="text-xs text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">mail</span> ${escapeHTML(s.student_email || 'N/A')}</p>
                 </div>
-                <select onchange="updateStatus('${s.id}', this.value)" class="text-[10px] font-bold rounded-full px-3 py-1 border-none bg-slate-100 dark:bg-slate-700">
+                <select onchange="updateStatus('${escapeHTML(s.id)}', this.value)" class="text-[10px] font-bold rounded-full px-3 py-1 border-none bg-slate-100 dark:bg-slate-700">
                     <option value="New" ${s.status === 'New' ? 'selected' : ''}>NEW</option>
                     <option value="Contacted" ${s.status === 'Contacted' ? 'selected' : ''}>CONTACTED</option>
                     <option value="Paid" ${s.status === 'Paid' ? 'selected' : ''}>PAID</option>
@@ -413,28 +588,28 @@ function renderStudentCards(students) {
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                 <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl">
                     <p class="text-[9px] font-bold text-slate-400 uppercase">Grade & Age</p>
-                    <p class="text-xs font-semibold">${s.student_grade || 'N/A'} (${s.student_age || '??'} yrs)</p>
+                    <p class="text-xs font-semibold">${escapeHTML(s.student_grade || 'N/A')} (${escapeHTML(s.student_age || '??')} yrs)</p>
                 </div>
                 <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl">
                     <p class="text-[9px] font-bold text-slate-400 uppercase">School</p>
-                    <p class="text-xs font-semibold truncate">${s.school_name || 'N/A'}</p>
+                    <p class="text-xs font-semibold truncate">${escapeHTML(s.school_name || 'N/A')}</p>
                 </div>
                 <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl">
                     <p class="text-[9px] font-bold text-slate-400 uppercase">Coding Exp</p>
-                    <p class="text-xs font-semibold">${s.coding_experience || 'None'}</p>
+                    <p class="text-xs font-semibold">${escapeHTML(s.coding_experience || 'None')}</p>
                 </div>
             </div>
             <div class="border-t border-slate-100 dark:border-slate-700 pt-4 flex gap-4 text-xs">
-                <div class="flex-1"><p class="text-[9px] font-bold text-primary uppercase">Parent Name</p><p class="font-bold">${s.parent_name || 'N/A'}</p></div>
-                <div class="flex-1"><p class="text-[9px] font-bold text-primary uppercase">Parent Contact</p><a href="tel:${s.parent_contact}" class="font-bold text-primary">${s.parent_contact || 'N/A'}</a></div>
+                <div class="flex-1"><p class="text-[9px] font-bold text-primary uppercase">Parent Name</p><p class="font-bold">${escapeHTML(s.parent_name || 'N/A')}</p></div>
+                <div class="flex-1"><p class="text-[9px] font-bold text-primary uppercase">Parent Contact</p><a href="tel:${escapeHTML(s.parent_contact || '')}" class="font-bold text-primary">${escapeHTML(s.parent_contact || 'N/A')}</a></div>
             </div>
             <div class="flex gap-4">
-                <a href="tel:${s.phone_number}" class="flex-1 bg-slate-100 dark:bg-slate-900 p-3 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">call</span> Student</a>
-                <a href="https://wa.me/${s.whatsapp_no}?text=Hi%20${s.student_name}..." target="_blank" class="flex-1 bg-green-500/10 text-green-600 p-3 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">chat</span> WhatsApp</a>
+                <a href="tel:${escapeHTML(s.phone_number || '')}" class="flex-1 bg-slate-100 dark:bg-slate-900 p-3 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">call</span> Student</a>
+                <a href="https://wa.me/${escapeHTML(s.whatsapp_no || '')}?text=Hi%20${encodeURIComponent(s.student_name || '')}..." target="_blank" class="flex-1 bg-green-500/10 text-green-600 p-3 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">chat</span> WhatsApp</a>
             </div>
             <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border-l-4 border-secondary">
                 <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Requirements</p>
-                <p class="text-sm italic text-slate-600 dark:text-slate-300">"${s.requirements || 'None'}"</p>
+                <p class="text-sm italic text-slate-600 dark:text-slate-300">"${escapeHTML(s.requirements || 'None')}"</p>
             </div>
         </div>
     `).join('') : '<p class="text-center py-10 text-slate-400">No students found.</p>';
@@ -444,7 +619,7 @@ function filterStudents() {
     const term = document.getElementById('student-search').value.toLowerCase();
     const cards = document.querySelectorAll('.student-card');
     cards.forEach(card => {
-        const text = card.getAttribute('data-search');
+        const text = card.getAttribute('data-search') || '';
         card.style.display = text.includes(term) ? 'block' : 'none';
     });
 }
@@ -455,24 +630,436 @@ async function updateStatus(regId, newStatus) {
 
 async function exportToCSV(courseId, courseName) {
     const { data: students, error } = await supabaseClient.from('income_registrations').select('*').eq('course_id', courseId);
-    if (error || !students.length) return alert("No data to export");
+    if (error || !students || !students.length) return alert('No data to export');
 
-    const headers = ["Student Name", "Email", "Phone", "WhatsApp", "Age", "Grade", "School", "Parent Name", "Parent Contact", "Coding Exp", "Source", "Status", "Requirements", "Date"];
+    const headers = ['Student Name', 'Email', 'Phone', 'WhatsApp', 'Age', 'Grade', 'School', 'Parent Name', 'Parent Contact', 'Coding Exp', 'Source', 'Status', 'Requirements', 'Date'];
     const csvContent = [
-        headers.join(","),
+        headers.join(','),
         ...students.map(s => [
-            `"${s.student_name}"`, s.student_email, s.phone_number, s.whatsapp_no, s.student_age || '', s.student_grade || '', `"${s.school_name || ''}"`, `"${s.parent_name || ''}"`, s.parent_contact || '', `"${s.coding_experience || ''}"`, s.referral_source || '', s.status, `"${(s.requirements || '').replace(/"/g, '""')}"`, new Date(s.created_at).toLocaleDateString()
-        ].join(","))
-    ].join("\n");
+            `"${s.student_name || ''}"`,
+            s.student_email || '',
+            s.phone_number || '',
+            s.whatsapp_no || '',
+            s.student_age || '',
+            s.student_grade || '',
+            `"${s.school_name || ''}"`,
+            `"${s.parent_name || ''}"`,
+            s.parent_contact || '',
+            `"${s.coding_experience || ''}"`,
+            s.referral_source || '',
+            s.status || '',
+            `"${String(s.requirements || '').replace(/"/g, '""')}"`,
+            new Date(s.created_at).toLocaleDateString()
+        ].join(','))
+    ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `Leads_${courseName.replace(/\s+/g, '_')}.csv`);
+    link.setAttribute('download', `Leads_${String(courseName || 'export').replace(/\s+/g, '_')}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 }
+
+// ------------------------
+// CONTENT MANAGER LOGIC
+// ------------------------
+let contentEditMode = false;
+
+function openContentModal() {
+    contentEditMode = false;
+    currentContentEditingId = null;
+    currentEditingPdfUrl = null;
+    document.getElementById('content-modal-title').innerText = 'Add PDF Resource';
+    document.getElementById('content-form').reset();
+    document.getElementById('content-modal').classList.remove('hidden');
+    loadBoardsAdmin();
+    resetContentDropdowns();
+}
+
+async function openContentEditModal(row) {
+    contentEditMode = true;
+    currentContentEditingId = row.id;
+    currentEditingPdfUrl = row.pdf_url || null;
+
+    document.getElementById('content-modal-title').innerText = 'Edit PDF Resource';
+    document.getElementById('content-modal').classList.remove('hidden');
+
+    // Reset inputs
+    document.getElementById('chapter-name').value = row.name || '';
+    document.getElementById('res-pdf').value = '';
+
+    // Load dropdowns properly
+    await loadBoardsAdmin();
+
+    const boardId = row.subject?.standard?.board?.id;
+    const stdId = row.subject?.standard?.id;
+    const subId = row.subject?.id;
+
+    document.getElementById('boardSelectAdmin').value = boardId;
+
+    await loadStandardsAdmin(boardId);
+    document.getElementById('standardSelectAdmin').value = stdId;
+
+    await loadSubjectsAdmin(stdId);
+    document.getElementById('subjectSelectAdmin').value = subId;
+}   
+
+function closeContentModal() {
+    document.getElementById('content-modal').classList.add('hidden');
+    document.getElementById('content-form').reset();
+    resetContentDropdowns();
+    contentEditMode = false;
+    currentContentEditingId = null;
+    currentEditingPdfUrl = null;
+}
+
+function prepareNewChapter() {
+    const chapterInput = document.getElementById('chapter-name');
+    chapterInput.value = '';
+    chapterInput.focus();
+}
+
+function normalizeTaxonomyName(value) {
+    return String(value || '').trim().toLowerCase();
+}
+
+function selectHasName(selectEl, name) {
+    if (!selectEl) return false;
+    const normalized = normalizeTaxonomyName(name);
+    return Array.from(selectEl.options).some(opt => normalizeTaxonomyName(opt.textContent) === normalized);
+}
+
+function getFriendlySupabaseErrorMessage(err, fallbackMessage) {
+    const raw = String(err?.message || '').toLowerCase();
+    if (raw.includes('row-level security') || raw.includes('violates row-level security policy')) {
+        return 'Permission denied by Supabase policy. Please sign in as admin or update your RLS/storage policies.';
+    }
+    if (raw.includes('duplicate key value')) {
+        return 'This value already exists. Please choose a different name or select it from the dropdown.';
+    }
+    return err?.message || fallbackMessage;
+}
+
+async function createTaxonomyItem(type) {
+    const labels = {
+        board: 'board',
+        standard: 'standard',
+        subject: 'subject'
+    };
+    const label = labels[type];
+    if (!label) return;
+
+    const input = prompt(`Enter new ${label} name:`);
+    if (input === null) return;
+    const name = input.trim();
+    if (!name) return alert(`Please enter a valid ${label} name.`);
+
+    const boardId = document.getElementById('boardSelectAdmin').value;
+    const stdId = document.getElementById('standardSelectAdmin').value;
+
+    if (type === 'standard' && !boardId) return alert('Select a board before adding a standard.');
+    if (type === 'subject' && !stdId) return alert('Select a standard before adding a subject.');
+
+    const boardSelect = document.getElementById('boardSelectAdmin');
+    const standardSelect = document.getElementById('standardSelectAdmin');
+    const subjectSelect = document.getElementById('subjectSelectAdmin');
+
+    if (type === 'board' && selectHasName(boardSelect, name)) return alert('This board already exists in the list.');
+    if (type === 'standard' && selectHasName(standardSelect, name)) return alert('This standard already exists in the list.');
+    if (type === 'subject' && selectHasName(subjectSelect, name)) return alert('This subject already exists in the list.');
+
+    try {
+        if (type === 'board') {
+            const { data, error } = await supabaseClient.from('boards').insert([{ name }]).select().single();
+            if (error) throw error;
+            await loadBoardsAdmin();
+            boardSelect.value = data.id;
+            await loadStandardsAdmin(data.id);
+            subjectSelect.innerHTML = '<option value="">Select standard first</option>';
+            subjectSelect.disabled = true;
+        } else if (type === 'standard') {
+            const { data, error } = await supabaseClient.from('standards').insert([{ name, board_id: boardId }]).select().single();
+            if (error) throw error;
+            await loadStandardsAdmin(boardId);
+            standardSelect.value = data.id;
+            await loadSubjectsAdmin(data.id);
+        } else if (type === 'subject') {
+            const { data, error } = await supabaseClient.from('subject').insert([{ name, standard_id: stdId }]).select().single();
+            if (error) throw error;
+            await loadSubjectsAdmin(stdId);
+            subjectSelect.value = data.id;
+        }
+    } catch (err) {
+        alert(getFriendlySupabaseErrorMessage(err, `Failed to create ${label}.`));
+    }
+}
+
+function resetContentDropdowns() {
+    const board = document.getElementById('boardSelectAdmin');
+    const standard = document.getElementById('standardSelectAdmin');
+    const subject = document.getElementById('subjectSelectAdmin');
+
+    if (board) board.innerHTML = '<option value="">Select Board</option>';
+    if (standard) {
+        standard.innerHTML = '<option value="">Select board first</option>';
+        standard.disabled = true;
+    }
+    if (subject) {
+        subject.innerHTML = '<option value="">Select standard first</option>';
+        subject.disabled = true;
+    }
+}
+
+async function loadBoardsAdmin() {
+    const { data, error } = await supabaseClient.from('boards').select('*').order('name', { ascending: true });
+    if (error) {
+        console.error(error);
+        return;
+    }
+    const d = document.getElementById('boardSelectAdmin');
+    d.innerHTML = '<option value="">Select Board</option>';
+    (data || []).forEach(b => d.innerHTML += `<option value="${b.id}">${b.name}</option>`);
+}
+
+async function loadStandardsAdmin(boardId) {
+    const standardSelect = document.getElementById('standardSelectAdmin');
+    const subjectSelect = document.getElementById('subjectSelectAdmin');
+
+    standardSelect.disabled = true;
+    subjectSelect.disabled = true;
+    standardSelect.innerHTML = '<option value="">Loading...</option>';
+    subjectSelect.innerHTML = '<option value="">Select standard first</option>';
+
+    if (!boardId) {
+        standardSelect.innerHTML = '<option value="">Select board first</option>';
+        return;
+    }
+
+    const { data, error } = await supabaseClient.from('standards').select('*').eq('board_id', boardId).order('name', { ascending: true });
+    if (error) {
+        console.error(error);
+        standardSelect.innerHTML = '<option value="">Error loading standards</option>';
+        return;
+    }
+
+    standardSelect.innerHTML = '<option value="">Select Standard</option>';
+    (data || []).forEach(s => standardSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`);
+    standardSelect.disabled = false;
+}
+
+async function loadSubjectsAdmin(standardId) {
+    const subjectSelect = document.getElementById('subjectSelectAdmin');
+
+    subjectSelect.disabled = true;
+    subjectSelect.innerHTML = '<option value="">Loading...</option>';
+
+    if (!standardId) {
+        subjectSelect.innerHTML = '<option value="">Select standard first</option>';
+        return;
+    }
+
+    const { data, error } = await supabaseClient.from('subject').select('*').eq('standard_id', standardId).order('name', { ascending: true });
+    if (error) {
+        console.error(error);
+        subjectSelect.innerHTML = '<option value="">Error loading subjects</option>';
+        return;
+    }
+
+    subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+    (data || []).forEach(s => subjectSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`);
+    subjectSelect.disabled = false;
+}
+
+document.addEventListener('change', (e) => {
+    if (e.target.id === 'boardSelectAdmin') {
+        loadStandardsAdmin(e.target.value);
+    }
+    if (e.target.id === 'standardSelectAdmin') {
+        loadSubjectsAdmin(e.target.value);
+    }
+});
+
+function findOptionLabel(selectId, value) {
+    const select = document.getElementById(selectId);
+    if (!select) return '';
+    const option = Array.from(select.options).find(opt => opt.value === value);
+    return option ? option.textContent : '';
+}
+
+async function savePDF() {
+    const saveBtn = document.getElementById('save-content-btn');
+    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...';
+
+    try {
+        let boardId = document.getElementById('boardSelectAdmin').value;
+        let stdId = document.getElementById('standardSelectAdmin').value;
+        let subId = document.getElementById('subjectSelectAdmin').value;
+        const chapterName = document.getElementById('chapter-name').value.trim();
+        const file = document.getElementById('res-pdf').files[0];
+
+        if (!contentEditMode && !file) {
+            throw new Error('Please choose a PDF file.');
+        }
+
+        if (!boardId) throw new Error('Select a board.');
+        if (!stdId) throw new Error('Select a standard.');
+        if (!subId) throw new Error('Select a subject.');
+        if (!chapterName) throw new Error('Enter a chapter name.');
+
+        let pdfUrl = currentEditingPdfUrl || null;
+
+        if (file) {
+            if (file.type !== 'application/pdf') {
+                throw new Error('Only PDF files are allowed.');
+            }
+
+            // DELETE OLD FILE (if editing)
+            if (contentEditMode && currentEditingPdfUrl) {
+                const oldPath = currentEditingPdfUrl.split('/resource-pdfs/')[1];
+                if (oldPath) {
+                    await supabaseClient.storage
+                        .from('resource-pdfs')
+                        .remove([oldPath]);
+                }
+            }
+
+            const cleanFileName = file.name.replace(/\s+/g, '_');
+            const fileName = `${boardId}/${stdId}/${subId}/${Date.now()}_${cleanFileName}`;
+            const { error: uploadError } = await supabaseClient.storage
+                .from('resource-pdfs')
+                .upload(fileName, file, { upsert: false });
+            if (uploadError) throw uploadError;
+
+            const { data } = supabaseClient.storage
+                .from('resource-pdfs')
+                .getPublicUrl(fileName);
+
+            pdfUrl = data.publicUrl;
+        }
+
+        if (contentEditMode && currentContentEditingId) {
+            const payload = {
+                name: chapterName,
+                subject_id: subId,
+                pdf_url: pdfUrl
+            };
+            const { error } = await supabaseClient.from('chapters').update(payload).eq('id', currentContentEditingId);
+            if (error) throw error;
+        } else {
+            const payload = {
+                name: chapterName,
+                subject_id: subId,
+                pdf_url: pdfUrl
+            };
+            const { error } = await supabaseClient.from('chapters').insert([payload]);
+            if (error) throw error;
+        }
+
+        closeContentModal();
+        loadContentManagerTable();
+    } catch (err) {
+        alert(getFriendlySupabaseErrorMessage(err, 'Failed to save PDF.'));
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerText = 'Save PDF';
+    }
+}
+
+document.getElementById('content-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await savePDF();
+});
+
+async function loadContentManagerTable() {
+    const table = document.getElementById('content-table-body');
+    table.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Loading PDFs...</td></tr>`;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('chapters')
+            .select(`
+                id,
+                name,
+                pdf_url,
+                subject:subject_id (
+                    id,
+                    name,
+                    standard:standard_id (
+                        id,
+                        name,
+                        board:board_id (
+                            id,
+                            name
+                        )
+                    )
+                )
+            `)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!data || !data.length) {
+            table.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">No PDFs found.</td></tr>`;
+            updateOverviewStats({ pdfs: 0 });
+            return;
+        }
+        contentCacheById = {};
+        data.forEach(item => {
+            contentCacheById[item.id] = item;
+        });
+
+        table.innerHTML = data.map(item => `
+            <tr class="border-b dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <td class="p-4 font-semibold">${escapeHTML(item.name)}</td>
+                <td class="p-4">${escapeHTML(item.subject?.standard?.board?.name || '—')}</td>
+                <td class="p-4">${escapeHTML(item.subject?.standard?.name || '—')}</td>
+                <td class="p-4">${escapeHTML(item.subject?.name || '—')}</td>
+                <td class="p-4">
+                    ${item.pdf_url ? `<a href="${escapeHTML(item.pdf_url)}" target="_blank" class="text-primary font-bold hover:underline">View</a>` : '<span class="text-slate-400">No PDF</span>'}
+                </td>
+                <td class="p-4 text-right flex justify-end gap-2">
+                    <button onclick="openContentEditModalById('${escapeHTML(item.id)}')" class="text-primary hover:bg-primary/10 p-2 rounded-lg transition-all">
+                        <span class="material-symbols-outlined text-sm">edit</span>
+                    </button>
+                    <button onclick="deletePDF('${escapeHTML(item.id)}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all">
+                        <span class="material-symbols-outlined text-sm">delete</span>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+        updateOverviewStats({ pdfs: data.length });
+    } catch (err) {
+        table.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Error: ${err.message}</td></tr>`;
+    }
+}
+
+function openContentEditModalById(itemId) {
+    const row = contentCacheById[itemId];
+    if (!row) return;
+    openContentEditModal(row);
+}
+
+async function deletePDF(id) {
+    if (!confirm('Delete this chapter record?')) return;
+    const { error } = await supabaseClient.from('chapters').delete().eq('id', id);
+    if (error) {
+        alert(error.message);
+        return;
+    }
+    loadContentManagerTable();
+}
+
+function handleLogout() {
+    window.location.href = 'index.html';
+}
+
+// init
+loadCourses();
+loadRegistrations();
+loadContentManagerTable();
 </script>
 </body>
 </html>

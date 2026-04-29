@@ -181,7 +181,7 @@
     <div class="w-full flex flex-col items-center py-12 px-6 space-y-10">
   <h2 class="text-[#00bfff] text-3xl font-bold border-b-4 border-current pb-2">View Notes / Resources</h2>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 w-full max-w-6xl">
   <div class="relative group">
     <label class="block text-[#00bfff] text-sm font-semibold mb-2">Select Board</label>
     <select id="boardSelect" onchange="fetchStandards()" class="w-full bg-orange-500 text-white font-medium py-3 px-4 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-4 focus:ring-[#00bfff] transition-all shadow-lg">
@@ -202,6 +202,13 @@
       <option value="" disabled selected>Select Standard First</option>
     </select>
   </div>
+
+  <div class="relative group">
+    <label class="block text-[#00bfff] text-sm font-semibold mb-2">Select Chapter</label>
+    <select id="chapterSelect" onchange="displayNote()" disabled class="w-full bg-orange-500 text-white font-medium py-3 px-4 rounded-lg appearance-none cursor-not-allowed opacity-50 focus:outline-none focus:ring-4 focus:ring-[#00bfff] transition-all shadow-lg">
+      <option value="" disabled selected>Select Subject First</option>
+    </select>
+  </div>
 </div>
 
 <div id="notesArea" class="w-full max-w-4xl mt-8">
@@ -212,108 +219,150 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = 'https://qomhhffaetgwjvifgcai.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvbWhoZmZhZXRnd2p2aWZnY2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMzY2NjQsImV4cCI6MjA4NjgxMjY2NH0.4Uf9enXmwlMEGZez8E9tNOzfh9AA74qcTUz15yfz1lQ';
-  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const boardDropdown = document.getElementById('boardSelect');
-        const standardDropdown = document.getElementById('standardSelect');
-        const subjectDropdown = document.getElementById('subjectSelect');
-        const notesList = document.getElementById('notesList');
-        const notesTitle = document.getElementById('notesTitle');
+const SUPABASE_URL = 'https://qomhhffaetgwjvifgcai.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvbWhoZmZhZXRnd2p2aWZnY2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMzY2NjQsImV4cCI6MjA4NjgxMjY2NH0.4Uf9enXmwlMEGZez8E9tNOzfh9AA74qcTUz15yfz1lQ';
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // 1. Initial Load: Fetch Boards
-        async function init() {
-        const { data, error } = await _supabase.from('boards').select('*');
-        if (data) {
+const boardDropdown = document.getElementById('boardSelect');
+const standardDropdown = document.getElementById('standardSelect');
+const subjectDropdown = document.getElementById('subjectSelect');
+const chapterDropdown = document.getElementById('chapterSelect'); // New
+const notesList = document.getElementById('notesList');
+const notesTitle = document.getElementById('notesTitle');
+
+// 1. Initial Load: Fetch Boards
+async function init() {
+    const { data, error } = await _supabase.from('boards').select('*');
+    if (data) {
         boardDropdown.innerHTML = '<option value="" disabled selected>Choose a Board</option>';
         data.forEach(board => {
             boardDropdown.innerHTML += `<option value="${board.id}">${board.name}</option>`;
         });
-        }
-        }
+    }
+}
 
-        // 2. Fetch Standards based on Board
-        async function fetchStandards() {
-        const boardId = boardDropdown.value;
-        resetDropdown(standardDropdown, "Choose Standard");
-        resetDropdown(subjectDropdown, "Select Standard First");
-        clearNotesList();
+// 2. Fetch Standards based on Board
+async function fetchStandards() {
+    const boardId = boardDropdown.value;
+    
+    // Reset all downstream menus
+    resetDropdown(standardDropdown, "Choose Standard");
+    resetDropdown(subjectDropdown, "Select Standard First");
+    resetDropdown(chapterDropdown, "Select Subject First");
+    clearNotesList();
 
-        const { data } = await _supabase.from('standards').select('*').eq('board_id', boardId);
-        if (data) {
+    const { data } = await _supabase.from('standards').select('*').eq('board_id', boardId);
+    if (data) {
         enableDropdown(standardDropdown);
         data.forEach(std => {
             standardDropdown.innerHTML += `<option value="${std.id}">${std.name}</option>`;
         });
-        }
-        }
+    }
+}
 
-        // 3. Fetch Subjects based on Standard
-        async function fetchSubjects() {
-        const standardId = standardDropdown.value;
-        resetDropdown(subjectDropdown, "Choose Subject");
-        clearNotesList();
+// 3. Fetch Subjects based on Standard
+async function fetchSubjects() {
+    const standardId = standardDropdown.value;
+    
+    // Reset all downstream menus
+    resetDropdown(subjectDropdown, "Choose Subject");
+    resetDropdown(chapterDropdown, "Select Subject First");
+    clearNotesList();
 
-        const { data } = await _supabase.from('subject').select('*').eq('standard_id', standardId);
-        if (data) {
+    const { data } = await _supabase.from('subject').select('*').eq('standard_id', standardId);
+    if (data) {
         enableDropdown(subjectDropdown);
         data.forEach(sub => {
             subjectDropdown.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
         });
-        }
-        }
+    }
+}
 
-        // 4. Fetch Chapters (Notes) based on Subject
-        async function fetchChapters() {
-        const subjectId = subjectDropdown.value;
-        clearNotesList();
+// 4. Fetch Chapters based on Subject
+async function fetchChapters() {
+    const selectedSubjectId = subjectDropdown.value;
+    
+    // UI Reset: Clear the chapter dropdown and any previously displayed notes
+    resetDropdown(chapterDropdown, "Choose Chapter");
+    clearNotesList();
 
-        const { data, error } = await _supabase
+    // Query Supabase: table 'chapters', filtering by column 'subject_id'
+    const { data, error } = await _supabase
         .from('chapters')
-        .select('*')
-        .eq('subject_id', subjectId); // Ensure your DB column is 'subject_id'
+        .select('id, name, pdf_url') // Fetching only what we need
+        .eq('subject_id', selectedSubjectId);
+    
+    if (error) {
+        console.error('Error fetching chapters:', error.message);
+        return;
+    }
 
-        if (data && data.length > 0) {
+    if (data && data.length > 0) {
+        enableDropdown(chapterDropdown);
+        data.forEach(chap => {
+            const option = document.createElement('option');
+            option.value = chap.id;
+            // Map the 'pdf_url' column from your DB to a data attribute
+            option.dataset.pdf = chap.pdf_url || ''; 
+            option.textContent = chap.name;
+            chapterDropdown.appendChild(option);
+        });
+    } else {
+        // If no chapters exist for this subject
+        chapterDropdown.innerHTML = '<option value="" disabled selected>No Chapters Found</option>';
+    }
+}
+
+// 5. Display specific Note/PDF when Chapter is selected
+function displayNote() {
+    clearNotesList();
+    const selectedOption = chapterDropdown.options[chapterDropdown.selectedIndex];
+    const pdfUrl = selectedOption.dataset.pdf;
+    const chapterName = selectedOption.textContent;
+
+    if (pdfUrl && pdfUrl !== '') {
         notesTitle.classList.remove('hidden');
-        data.forEach((chap, index) => {
-            const card = document.createElement('div');
-            card.className = "flex items-center justify-between bg-white/5 backdrop-blur-md p-4 rounded-xl border border-gray-200 hover:border-[#00bfff] transition-all shadow-sm w-full animate-fadeIn";
-            card.style.animationDelay = `${index * 0.05}s`;
-            
-            card.innerHTML = `
+        const card = document.createElement('div');
+        card.className = "flex items-center justify-between bg-white/5 backdrop-blur-md p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#00bfff] transition-all shadow-sm w-full animate-step-down";
+        
+        card.innerHTML = `
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-orange-500">description</span>
-                <span class="font-medium text-lg">${chap.name}</span>
+                <span class="font-medium text-lg">${chapterName}</span>
             </div>
-            <a href="${chap.pdf_url || '#'}" target="_blank" 
-                class="${chap.pdf_url ? 'flex' : 'hidden'} items-center gap-2 bg-[#00bfff] text-white px-5 py-2.5 rounded-lg font-bold hover:scale-105 transition-all">
+            <a href="${pdfUrl}" target="_blank" 
+                class="flex items-center gap-2 bg-[#00bfff] text-white px-5 py-2.5 rounded-lg font-bold hover:scale-105 transition-all">
                 <span>Download</span>
                 <span class="material-symbols-outlined text-[20px]">download</span>
             </a>
-            `;
-            notesList.appendChild(card);
-        });
-        }
-        }
+        `;
+        notesList.appendChild(card);
+    } else {
+        // Handle case where no PDF is available
+        notesTitle.classList.remove('hidden');
+        notesList.innerHTML = `<p class="text-gray-500 italic px-4">No PDF resource available for this chapter yet.</p>`;
+    }
+}
 
-        // Helper Functions
-        function resetDropdown(dropdown, text) {
-        dropdown.disabled = true;
-        dropdown.classList.add('cursor-not-allowed', 'opacity-50');
-        dropdown.innerHTML = `<option value="" disabled selected>${text}</option>`;
-        }
+// Helper Functions
+function resetDropdown(dropdown, text) {
+    dropdown.disabled = true;
+    dropdown.classList.add('cursor-not-allowed', 'opacity-50');
+    dropdown.innerHTML = `<option value="" disabled selected>${text}</option>`;
+}
 
-        function enableDropdown(dropdown) {
-        dropdown.disabled = false;
-        dropdown.classList.remove('cursor-not-allowed', 'opacity-50');
-        }
+function enableDropdown(dropdown) {
+    dropdown.disabled = false;
+    dropdown.classList.remove('cursor-not-allowed', 'opacity-50');
+}
 
-        function clearNotesList() {
-        notesList.innerHTML = '';
-        notesTitle.classList.add('hidden');
-        }
+function clearNotesList() {
+    notesList.innerHTML = '';
+    notesTitle.classList.add('hidden');
+}
 
-        init();
+// Kick off the initial load
+init();
 </script>
 <footer>
 <exam-footer></exam-footer>

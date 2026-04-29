@@ -33,29 +33,26 @@
         };
     </script>
 </head>
-<header class="relative z-[100]">
-    <exam-navbar></exam-navbar>
-</header>
 <body class="font-display pt-24 bg-white text-slate-900 dark:bg-slate-950 dark:text-white antialiased overflow-x-hidden">
+    <header class="relative z-[100]">
+        <exam-navbar></exam-navbar>
+    </header>
+
     <main class="max-w-7xl mx-auto py-16 px-6">
         <div class="text-center mb-16">
             <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4">Tools</h1>
-            <p class="text-slate-500">Useful tools and quick links for students.</p>
+            <p class="text-slate-500 dark:text-slate-400">Useful tools and quick links for students.</p>
         </div>
 
         <div id="tools-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 p-5 shadow-sm">
-                <div class="px-2">
-                    <h3 class="text-xl font-bold text-slate-800 dark:text-white">Loading tools...</h3>
-                </div>
-            </div>
+            <p class="md:col-span-2 lg:col-span-3 text-center text-slate-500 dark:text-slate-400">Loading tools...</p>
         </div>
     </main>
 
     <footer>
         <exam-footer></exam-footer>
     </footer>
-</body>
+
 <script>
 const _supabaseUrl = 'https://qomhhffaetgwjvifgcai.supabase.co';
 const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvbWhoZmZhZXRnd2p2aWZnY2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMzY2NjQsImV4cCI6MjA4NjgxMjY2NH0.4Uf9enXmwlMEGZez8E9tNOzfh9AA74qcTUz15yfz1lQ';
@@ -70,46 +67,36 @@ function escapeHTML(value) {
         .replace(/'/g, '&#39;');
 }
 
-function renderFallbackTools() {
+function renderToolsStatus(message, isError = false) {
     const grid = document.getElementById('tools-grid');
-    grid.innerHTML = `
-        <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 p-5 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col group">
-            <div class="relative overflow-hidden rounded-[1.8rem] mb-6 bg-slate-50 dark:bg-slate-800 min-h-[220px] flex items-center justify-center">
-            ${tool.image_url 
-                ? `<img src="${tool.image_url}" class="w-20 h-20 object-contain" />`
-                : `<span class="material-icons text-primary text-7xl">${escapeHTML(tool.icon || 'build')}</span>`
-            }
-            </div>
-            <div class="px-2 flex flex-col flex-1">
-                <h3 class="text-2xl font-bold mb-3 text-slate-800 dark:text-white">Examination Portal</h3>
-                <p class="text-slate-500 dark:text-slate-300 mb-6">Access the official examination dashboard, updates, and exam links.</p>
-                <div class="mt-auto">
-                    <a href="https://exam.examfriendly.in" target="_blank" class="block w-full bg-primary text-white text-center py-4 rounded-2xl font-bold text-sm shadow-lg shadow-primary/20">
-                        Open Examination
-                    </a>
-                </div>
-            </div>
-        </div>
-    `;
+    grid.innerHTML = `<p class="md:col-span-2 lg:col-span-3 text-center ${isError ? 'text-red-500' : 'text-slate-500 dark:text-slate-400'}">${escapeHTML(message)}</p>`;
+}
+
+function renderToolVisual(tool) {
+    if (tool.image_url) {
+        return `<img src="${escapeHTML(tool.image_url)}" alt="${escapeHTML(tool.name || 'Tool logo')}" class="w-24 h-24 object-contain" loading="lazy" />`;
+    }
+
+    return `<span class="material-icons text-primary text-7xl">${escapeHTML(tool.icon || 'build')}</span>`;
 }
 
 function renderTools(rows) {
     const grid = document.getElementById('tools-grid');
     if (!rows.length) {
-        renderFallbackTools();
+        renderToolsStatus('No tools are available yet.');
         return;
     }
 
     grid.innerHTML = rows.map((tool) => `
         <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 p-5 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col group">
             <div class="relative overflow-hidden rounded-[1.8rem] mb-6 bg-slate-50 dark:bg-slate-800 min-h-[220px] flex items-center justify-center">
-                <span class="material-icons text-primary text-7xl">${escapeHTML(tool.icon || 'build')}</span>
+                ${renderToolVisual(tool)}
             </div>
             <div class="px-2 flex flex-col flex-1">
                 <h3 class="text-2xl font-bold mb-3 text-slate-800 dark:text-white">${escapeHTML(tool.name || 'Untitled Tool')}</h3>
                 <p class="text-slate-500 dark:text-slate-300 mb-6">${escapeHTML(tool.description || 'No description added yet.')}</p>
                 <div class="mt-auto">
-                    <a href="${escapeHTML(tool.link || '#')}" target="_blank" class="block w-full bg-primary text-white text-center py-4 rounded-2xl font-bold text-sm shadow-lg shadow-primary/20">
+                    <a href="${escapeHTML(tool.link || '#')}" target="_blank" rel="noopener noreferrer" class="block w-full bg-primary text-white text-center py-4 rounded-2xl font-bold text-sm shadow-lg shadow-primary/20">
                         ${escapeHTML(tool.button_text || 'Open Tool')}
                     </a>
                 </div>
@@ -128,10 +115,11 @@ async function loadTools() {
         renderTools(data || []);
     } catch (err) {
         console.error(err);
-        renderFallbackTools();
+        renderToolsStatus('Unable to load tools right now.', true);
     }
 }
 
 loadTools();
 </script>
+</body>
 </html>

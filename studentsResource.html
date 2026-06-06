@@ -286,10 +286,9 @@ async function fetchChapters() {
     resetDropdown(chapterDropdown, "Choose Chapter");
     clearNotesList();
 
-    // Query Supabase: table 'chapters', filtering by column 'subject_id'
     const { data, error } = await _supabase
         .from('chapters')
-        .select('id, name, pdf_url') // Fetching only what we need
+        .select('id, name')
         .eq('subject_id', selectedSubjectId);
     
     if (error) {
@@ -302,8 +301,6 @@ async function fetchChapters() {
         data.forEach(chap => {
             const option = document.createElement('option');
             option.value = chap.id;
-            // Map the 'pdf_url' column from your DB to a data attribute
-            option.dataset.pdf = chap.pdf_url || ''; 
             option.textContent = chap.name;
             chapterDropdown.appendChild(option);
         });
@@ -313,35 +310,62 @@ async function fetchChapters() {
     }
 }
 
-// 5. Display specific Note/PDF when Chapter is selected
-function displayNote() {
+// 5. Display all resources connected to the selected chapter
+async function displayNote() {
     clearNotesList();
-    const selectedOption = chapterDropdown.options[chapterDropdown.selectedIndex];
-    const pdfUrl = selectedOption.dataset.pdf;
-    const chapterName = selectedOption.textContent;
+    const chapterId = chapterDropdown.value;
+    if (!chapterId) return;
 
-    if (pdfUrl && pdfUrl !== '') {
-        notesTitle.classList.remove('hidden');
+    let { data, error } = await _supabase
+        .from('resources')
+        .select('id, name, pdf_url')
+        .eq('chapter_id', chapterId)
+        .order('created_at', { ascending: false });
+
+    // Keep the live page working until the resources-table migration is deployed.
+    if (error && (error.message.includes('resources') || error.message.includes('schema cache'))) {
+        const legacyResult = await _supabase
+            .from('chapters')
+            .select('id, name, pdf_url')
+            .eq('id', chapterId)
+            .single();
+        error = legacyResult.error;
+        data = legacyResult.data?.pdf_url ? [{
+            id: legacyResult.data.id,
+            name: legacyResult.data.name,
+            pdf_url: legacyResult.data.pdf_url
+        }] : [];
+    }
+
+    notesTitle.classList.remove('hidden');
+
+    if (error) {
+        console.error('Error fetching resources:', error.message);
+        notesList.innerHTML = `<p class="text-gray-500 italic px-4">Unable to load resources for this chapter.</p>`;
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        notesList.innerHTML = `<p class="text-gray-500 italic px-4">No PDF resources available for this chapter yet.</p>`;
+        return;
+    }
+
+    data.forEach(resource => {
         const card = document.createElement('div');
         card.className = "flex items-center justify-between bg-white/5 backdrop-blur-md p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#00bfff] transition-all shadow-sm w-full animate-step-down";
-        
         card.innerHTML = `
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-orange-500">description</span>
-                <span class="font-medium text-lg">${chapterName}</span>
+                <span class="font-medium text-lg">${resource.name}</span>
             </div>
-            <a href="${pdfUrl}" target="_blank" 
+            <a href="${resource.pdf_url}" target="_blank"
                 class="flex items-center gap-2 bg-[#00bfff] text-white px-5 py-2.5 rounded-lg font-bold hover:scale-105 transition-all">
                 <span>Download</span>
                 <span class="material-symbols-outlined text-[20px]">download</span>
             </a>
         `;
         notesList.appendChild(card);
-    } else {
-        // Handle case where no PDF is available
-        notesTitle.classList.remove('hidden');
-        notesList.innerHTML = `<p class="text-gray-500 italic px-4">No PDF resource available for this chapter yet.</p>`;
-    }
+    });
 }
 
 // Helper Functions

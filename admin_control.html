@@ -355,11 +355,12 @@
                 <h3 class="text-2xl font-bold">Content Manager</h3>
                 <button onclick="openContentModal()" class="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-primary/20">+ Add New</button>
             </div>
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-slate-50 dark:bg-slate-800/50">
                         <tr>
                             <th class="p-4 text-xs font-bold uppercase text-slate-500">Chapter</th>
+                            <th class="p-4 text-xs font-bold uppercase text-slate-500">Resource Name</th>
                             <th class="p-4 text-xs font-bold uppercase text-slate-500">Board</th>
                             <th class="p-4 text-xs font-bold uppercase text-slate-500">Std</th>
                             <th class="p-4 text-xs font-bold uppercase text-slate-500">Subject</th>
@@ -513,7 +514,7 @@
         <div class="w-full md:w-80 bg-slate-50 dark:bg-slate-800/50 p-8 border-r border-slate-100 dark:border-slate-800 flex flex-col justify-between">
             <div>
                 <h3 id="content-modal-title" class="text-xl font-bold text-slate-900 dark:text-white mb-2">Add PDF Resource</h3>
-                <p class="text-sm text-slate-500 dark:text-slate-400 leading-6">Pick board, standard and subject, then add a chapter.</p>
+                <p class="text-sm text-slate-500 dark:text-slate-400 leading-6">Pick a chapter, name the resource and upload its PDF.</p>
                 <div class="mt-6 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
                     <p class="text-[10px] uppercase tracking-wide font-bold text-slate-400">Tip</p>
                     <p class="text-xs mt-2 text-slate-600 dark:text-slate-300">Use the + buttons next to dropdowns to quickly add missing board, standard or subject.</p>
@@ -561,12 +562,20 @@
                         </div>
                     </div>
 
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between gap-4">
-                            <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Chapter Name</label>
-                            <button type="button" onclick="prepareNewChapter()" class="text-xs font-bold text-primary hover:underline">+ ADD NEW</button>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between gap-4">
+                                <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Chapter</label>
+                                <button type="button" onclick="prepareNewChapter()" class="text-xs font-bold text-primary hover:underline">+ ADD NEW</button>
+                            </div>
+                            <select id="chapterSelectAdmin" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 disabled:opacity-70" disabled required>
+                                <option value="">Select subject first</option>
+                            </select>
                         </div>
-                        <input type="text" id="chapter-name" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10" placeholder="Chapter name" required>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Resource Name</label>
+                            <input type="text" id="resource-name" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10" placeholder="Resource name" required>
+                        </div>
                     </div>
 
                     <div class="space-y-2">
@@ -1232,15 +1241,16 @@ async function openContentEditModal(row) {
     document.getElementById('content-modal').classList.remove('hidden');
 
     // Reset inputs
-    document.getElementById('chapter-name').value = row.name || '';
+    document.getElementById('resource-name').value = row.name || '';
     document.getElementById('res-pdf').value = '';
 
     // Load dropdowns properly
     await loadBoardsAdmin();
 
-    const boardId = row.subject?.standard?.board?.id;
-    const stdId = row.subject?.standard?.id;
-    const subId = row.subject?.id;
+    const boardId = row.chapter?.subject?.standard?.board?.id;
+    const stdId = row.chapter?.subject?.standard?.id;
+    const subId = row.chapter?.subject?.id;
+    const chapterId = row.chapter?.id;
 
     document.getElementById('boardSelectAdmin').value = boardId;
 
@@ -1249,6 +1259,9 @@ async function openContentEditModal(row) {
 
     await loadSubjectsAdmin(stdId);
     document.getElementById('subjectSelectAdmin').value = subId;
+
+    await loadChaptersAdmin(subId);
+    document.getElementById('chapterSelectAdmin').value = chapterId;
 }   
 
 function closeContentModal() {
@@ -1260,10 +1273,30 @@ function closeContentModal() {
     currentEditingPdfUrl = null;
 }
 
-function prepareNewChapter() {
-    const chapterInput = document.getElementById('chapter-name');
-    chapterInput.value = '';
-    chapterInput.focus();
+async function prepareNewChapter() {
+    const subjectId = document.getElementById('subjectSelectAdmin').value;
+    if (!subjectId) return alert('Select a subject before adding a chapter.');
+
+    const input = prompt('Enter new chapter name:');
+    if (input === null) return;
+    const name = input.trim();
+    if (!name) return alert('Please enter a valid chapter name.');
+
+    const chapterSelect = document.getElementById('chapterSelectAdmin');
+    if (selectHasName(chapterSelect, name)) return alert('This chapter already exists in the list.');
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('chapters')
+            .insert([{ name, subject_id: subjectId }])
+            .select()
+            .single();
+        if (error) throw error;
+        await loadChaptersAdmin(subjectId);
+        chapterSelect.value = data.id;
+    } catch (err) {
+        alert(getFriendlySupabaseErrorMessage(err, 'Failed to create chapter.'));
+    }
 }
 
 function normalizeTaxonomyName(value) {
@@ -1278,6 +1311,9 @@ function selectHasName(selectEl, name) {
 
 function getFriendlySupabaseErrorMessage(err, fallbackMessage) {
     const raw = String(err?.message || '').toLowerCase();
+    if (raw.includes('resources') && (raw.includes('does not exist') || raw.includes('schema cache'))) {
+        return 'The chapter resources database migration has not been applied yet.';
+    }
     if (raw.includes('row-level security') || raw.includes('violates row-level security policy')) {
         return 'Permission denied by Supabase policy. Please sign in as admin or update your RLS/storage policies.';
     }
@@ -1335,6 +1371,7 @@ async function createTaxonomyItem(type) {
             if (error) throw error;
             await loadSubjectsAdmin(stdId);
             subjectSelect.value = data.id;
+            await loadChaptersAdmin(data.id);
         }
     } catch (err) {
         alert(getFriendlySupabaseErrorMessage(err, `Failed to create ${label}.`));
@@ -1345,6 +1382,7 @@ function resetContentDropdowns() {
     const board = document.getElementById('boardSelectAdmin');
     const standard = document.getElementById('standardSelectAdmin');
     const subject = document.getElementById('subjectSelectAdmin');
+    const chapter = document.getElementById('chapterSelectAdmin');
 
     if (board) board.innerHTML = '<option value="">Select Board</option>';
     if (standard) {
@@ -1354,6 +1392,10 @@ function resetContentDropdowns() {
     if (subject) {
         subject.innerHTML = '<option value="">Select standard first</option>';
         subject.disabled = true;
+    }
+    if (chapter) {
+        chapter.innerHTML = '<option value="">Select subject first</option>';
+        chapter.disabled = true;
     }
 }
 
@@ -1371,11 +1413,14 @@ async function loadBoardsAdmin() {
 async function loadStandardsAdmin(boardId) {
     const standardSelect = document.getElementById('standardSelectAdmin');
     const subjectSelect = document.getElementById('subjectSelectAdmin');
+    const chapterSelect = document.getElementById('chapterSelectAdmin');
 
     standardSelect.disabled = true;
     subjectSelect.disabled = true;
+    chapterSelect.disabled = true;
     standardSelect.innerHTML = '<option value="">Loading...</option>';
     subjectSelect.innerHTML = '<option value="">Select standard first</option>';
+    chapterSelect.innerHTML = '<option value="">Select subject first</option>';
 
     if (!boardId) {
         standardSelect.innerHTML = '<option value="">Select board first</option>';
@@ -1396,9 +1441,12 @@ async function loadStandardsAdmin(boardId) {
 
 async function loadSubjectsAdmin(standardId) {
     const subjectSelect = document.getElementById('subjectSelectAdmin');
+    const chapterSelect = document.getElementById('chapterSelectAdmin');
 
     subjectSelect.disabled = true;
+    chapterSelect.disabled = true;
     subjectSelect.innerHTML = '<option value="">Loading...</option>';
+    chapterSelect.innerHTML = '<option value="">Select subject first</option>';
 
     if (!standardId) {
         subjectSelect.innerHTML = '<option value="">Select standard first</option>';
@@ -1417,12 +1465,43 @@ async function loadSubjectsAdmin(standardId) {
     subjectSelect.disabled = false;
 }
 
+async function loadChaptersAdmin(subjectId) {
+    const chapterSelect = document.getElementById('chapterSelectAdmin');
+    chapterSelect.disabled = true;
+    chapterSelect.innerHTML = '<option value="">Loading...</option>';
+
+    if (!subjectId) {
+        chapterSelect.innerHTML = '<option value="">Select subject first</option>';
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from('chapters')
+        .select('id, name')
+        .eq('subject_id', subjectId)
+        .order('name', { ascending: true });
+    if (error) {
+        console.error(error);
+        chapterSelect.innerHTML = '<option value="">Error loading chapters</option>';
+        return;
+    }
+
+    chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
+    (data || []).forEach(chapter => {
+        chapterSelect.innerHTML += `<option value="${chapter.id}">${escapeHTML(chapter.name)}</option>`;
+    });
+    chapterSelect.disabled = false;
+}
+
 document.addEventListener('change', (e) => {
     if (e.target.id === 'boardSelectAdmin') {
         loadStandardsAdmin(e.target.value);
     }
     if (e.target.id === 'standardSelectAdmin') {
         loadSubjectsAdmin(e.target.value);
+    }
+    if (e.target.id === 'subjectSelectAdmin') {
+        loadChaptersAdmin(e.target.value);
     }
 });
 
@@ -1442,7 +1521,8 @@ async function savePDF() {
         let boardId = document.getElementById('boardSelectAdmin').value;
         let stdId = document.getElementById('standardSelectAdmin').value;
         let subId = document.getElementById('subjectSelectAdmin').value;
-        const chapterName = document.getElementById('chapter-name').value.trim();
+        const chapterId = document.getElementById('chapterSelectAdmin').value;
+        const resourceName = document.getElementById('resource-name').value.trim();
         const file = document.getElementById('res-pdf').files[0];
 
         if (!contentEditMode && !file) {
@@ -1452,7 +1532,8 @@ async function savePDF() {
         if (!boardId) throw new Error('Select a board.');
         if (!stdId) throw new Error('Select a standard.');
         if (!subId) throw new Error('Select a subject.');
-        if (!chapterName) throw new Error('Enter a chapter name.');
+        if (!chapterId) throw new Error('Select a chapter.');
+        if (!resourceName) throw new Error('Enter a resource name.');
 
         let pdfUrl = currentEditingPdfUrl || null;
 
@@ -1487,19 +1568,19 @@ async function savePDF() {
 
         if (contentEditMode && currentContentEditingId) {
             const payload = {
-                name: chapterName,
-                subject_id: subId,
+                name: resourceName,
+                chapter_id: chapterId,
                 pdf_url: pdfUrl
             };
-            const { error } = await supabaseClient.from('chapters').update(payload).eq('id', currentContentEditingId);
+            const { error } = await supabaseClient.from('resources').update(payload).eq('id', currentContentEditingId);
             if (error) throw error;
         } else {
             const payload = {
-                name: chapterName,
-                subject_id: subId,
+                name: resourceName,
+                chapter_id: chapterId,
                 pdf_url: pdfUrl
             };
-            const { error } = await supabaseClient.from('chapters').insert([payload]);
+            const { error } = await supabaseClient.from('resources').insert([payload]);
             if (error) throw error;
         }
 
@@ -1520,24 +1601,28 @@ document.getElementById('content-form').addEventListener('submit', async (e) => 
 
 async function loadContentManagerTable() {
     const table = document.getElementById('content-table-body');
-    table.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Loading PDFs...</td></tr>`;
+    table.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Loading PDFs...</td></tr>`;
 
     try {
         const { data, error } = await supabaseClient
-            .from('chapters')
+            .from('resources')
             .select(`
                 id,
                 name,
                 pdf_url,
-                subject:subject_id (
+                chapter:chapter_id (
                     id,
                     name,
-                    standard:standard_id (
+                    subject:subject_id (
                         id,
                         name,
-                        board:board_id (
+                        standard:standard_id (
                             id,
-                            name
+                            name,
+                            board:board_id (
+                                id,
+                                name
+                            )
                         )
                     )
                 )
@@ -1547,7 +1632,7 @@ async function loadContentManagerTable() {
         if (error) throw error;
 
         if (!data || !data.length) {
-            table.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">No PDFs found.</td></tr>`;
+            table.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">No PDFs found.</td></tr>`;
             updateOverviewStats({ pdfs: 0 });
             return;
         }
@@ -1558,10 +1643,11 @@ async function loadContentManagerTable() {
 
         table.innerHTML = data.map(item => `
             <tr class="border-b dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <td class="p-4 font-semibold">${escapeHTML(item.chapter?.name || '—')}</td>
                 <td class="p-4 font-semibold">${escapeHTML(item.name)}</td>
-                <td class="p-4">${escapeHTML(item.subject?.standard?.board?.name || '—')}</td>
-                <td class="p-4">${escapeHTML(item.subject?.standard?.name || '—')}</td>
-                <td class="p-4">${escapeHTML(item.subject?.name || '—')}</td>
+                <td class="p-4">${escapeHTML(item.chapter?.subject?.standard?.board?.name || '—')}</td>
+                <td class="p-4">${escapeHTML(item.chapter?.subject?.standard?.name || '—')}</td>
+                <td class="p-4">${escapeHTML(item.chapter?.subject?.name || '—')}</td>
                 <td class="p-4">
                     ${item.pdf_url ? `<a href="${escapeHTML(item.pdf_url)}" target="_blank" class="text-primary font-bold hover:underline">View</a>` : '<span class="text-slate-400">No PDF</span>'}
                 </td>
@@ -1577,7 +1663,7 @@ async function loadContentManagerTable() {
         `).join('');
         updateOverviewStats({ pdfs: data.length });
     } catch (err) {
-        table.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Error: ${err.message}</td></tr>`;
+        table.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500">Error: ${err.message}</td></tr>`;
     }
 }
 
@@ -1588,8 +1674,8 @@ function openContentEditModalById(itemId) {
 }
 
 async function deletePDF(id) {
-    if (!confirm('Delete this chapter record?')) return;
-    const { error } = await supabaseClient.from('chapters').delete().eq('id', id);
+    if (!confirm('Delete this resource?')) return;
+    const { error } = await supabaseClient.from('resources').delete().eq('id', id);
     if (error) {
         alert(error.message);
         return;

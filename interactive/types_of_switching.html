@@ -1,1 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Network Switching Lab</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
 
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        circuit: '#f43f5e',
+                        message: '#f59e0b',
+                        packet: '#10b981',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+        }
+        .canvas-bg {
+            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.4);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.6);
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.7);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased">
+
+    <!-- App Header -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid font-bold text-white text-lg fa-network-wired"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base font-bold text-white">Network Switching Interactive Lab</h1>
+                        <span class="px-2 py-0.5 text-[10px] font-semibold bg-blue-500/20 text-blue-300 rounded-full border border-blue-500/30">v2.0 Visualizer</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Drag nodes, run simulations, and understand Circuit, Message & Packet switching</p>
+                </div>
+            </div>
+
+            <!-- Header Action Controls & Quick Guide -->
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleAudio()" id="btn-audio" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 border border-slate-700" title="Toggle Sound Cues">
+                    <i class="fa-solid fa-volume-high text-slate-400" id="audio-icon"></i>
+                    <span id="audio-label" class="hidden sm:inline">Audio On</span>
+                </button>
+                <button onclick="openHelpModal()" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shadow-md shadow-blue-600/20">
+                    <i class="fa-solid fa-circle-question"></i> How To Use
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mode Tab & Quick Preset Toolbar -->
+    <div class="bg-slate-900/60 border-b border-slate-800/80 px-4 py-2.5">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- Switching Mode Switcher Tabs -->
+            <div class="flex flex-wrap items-center bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1 text-xs font-medium">
+                <button id="tab-circuit" onclick="setSwitchingType('circuit')" 
+                    class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 text-slate-300 hover:text-white">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                    Circuit Switching
+                </button>
+                <button id="tab-message" onclick="setSwitchingType('message')" 
+                    class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 text-slate-300 hover:text-white">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                    Message Switching
+                </button>
+                <button id="tab-packet" onclick="setSwitchingType('packet')" 
+                    class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 text-slate-300 hover:text-white">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    Packet Switching
+                </button>
+                <button id="tab-mactable" onclick="setSwitchingType('mactable')" 
+                    class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-table-list text-blue-400"></i>
+                    MAC Table Learning
+                </button>
+            </div>
+
+            <!-- Guided Preset Buttons -->
+            <div class="flex items-center gap-2 text-xs">
+                <span class="text-slate-400 font-semibold text-[11px] uppercase tracking-wider hidden md:inline">Quick Presets:</span>
+                <button onclick="loadPreset('phone')" class="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 rounded-lg border border-rose-500/30 transition flex items-center gap-1">
+                    <i class="fa-solid fa-phone text-[10px]"></i> Phone Call
+                </button>
+                <button onclick="loadPreset('telegraph')" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 rounded-lg border border-amber-500/30 transition flex items-center gap-1">
+                    <i class="fa-solid fa-user-secret text-[10px]"></i> Telegraph Tapping
+                </button>
+                <button onclick="loadPreset('web')" class="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 rounded-lg border border-emerald-500/30 transition flex items-center gap-1">
+                    <i class="fa-solid fa-globe text-[10px]"></i> Internet Web Traffic
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Interactive Dashboard Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Column: Primary Visualizer & Canvas (8 cols on lg) -->
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            
+            <!-- Real-Time Step Commentary Banner (User Friendliness Upgrade) -->
+            <div id="step-banner" class="bg-gradient-to-r from-blue-900/40 via-indigo-900/40 to-slate-900 border border-blue-500/30 rounded-xl p-3.5 flex items-center gap-3 shadow-lg">
+                <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/40 text-sm">
+                    <i class="fa-solid fa-lightbulb" id="step-icon"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-0.5">
+                        <span class="text-[10px] font-bold font-mono uppercase tracking-wider text-blue-400" id="step-phase">INSTRUCTION</span>
+                        <span class="text-[10px] font-mono text-slate-400" id="step-count">Step 0 of 0</span>
+                    </div>
+                    <p class="text-xs font-medium text-slate-200 truncate sm:whitespace-normal" id="step-text">
+                        Select a switching technique above or click "Start Transmission" to observe data flow in real time.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Canvas Visualizer Container -->
+            <div class="canvas-bg relative rounded-2xl border border-slate-800 overflow-hidden shadow-2xl flex flex-col min-h-[420px] sm:min-h-[480px]">
+                
+                <!-- Canvas Control Overlay Header -->
+                <div class="p-3 sm:p-4 bg-slate-900/90 border-b border-slate-800/80 backdrop-blur-sm flex flex-wrap items-center justify-between gap-3 z-10">
+                    <div class="flex items-center gap-2">
+                        <span id="current-badge" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                            Circuit Switching
+                        </span>
+                        <span id="status-indicator" class="text-xs font-mono text-slate-400 truncate max-w-[200px] sm:max-w-xs">
+                            Status: Ready
+                        </span>
+                    </div>
+
+                    <!-- Action Control Buttons -->
+                    <div class="flex items-center space-x-2">
+                        <button id="btn-start" onclick="startSimulation()" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-md shadow-blue-600/30">
+                            <i class="fa-solid fa-play"></i> Start Transmission
+                        </button>
+                        <button id="btn-pause" onclick="togglePause()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 border border-slate-700" disabled>
+                            <i class="fa-solid fa-pause"></i> Pause
+                        </button>
+                        <button onclick="resetSimulation()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition-all flex items-center gap-1 border border-slate-700" title="Reset Simulation">
+                            <i class="fa-solid fa-rotate-left"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulation Interactive Canvas Area -->
+                <div class="relative flex-1 w-full h-full min-h-[340px]" id="canvas-wrapper">
+                    <canvas id="simCanvas" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
+                    
+                    <!-- Interactive Node Inspector Hover Tooltip -->
+                    <div id="node-inspector" class="hidden absolute pointer-events-none glass-panel rounded-xl p-3 shadow-2xl text-xs z-20 max-w-xs transition-opacity duration-150">
+                        <div class="font-bold text-slate-200 flex items-center justify-between gap-2 mb-1 border-b border-slate-700 pb-1">
+                            <span id="inspect-title" class="flex items-center gap-1.5">Node Info</span>
+                            <span id="inspect-mac" class="font-mono text-[10px] text-blue-400"></span>
+                        </div>
+                        <div class="text-slate-300 font-mono space-y-1 text-[11px]" id="inspect-body">
+                            Hover over nodes or packets...
+                        </div>
+                    </div>
+
+                    <!-- Floating Canvas Tip -->
+                    <div class="absolute bottom-3 left-3 pointer-events-none bg-slate-950/80 border border-slate-800 rounded-lg px-2.5 py-1 text-[10px] text-slate-400 font-mono backdrop-blur">
+                        <i class="fa-solid fa-hand-pointer mr-1 text-blue-400"></i> Drag nodes to reposition | Click node to inspect details
+                    </div>
+                </div>
+
+                <!-- Canvas Control Footer Bar -->
+                <div class="p-3 bg-slate-900/90 border-t border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs z-10">
+                    <!-- Simulation Speed Control -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-400 font-medium text-xs">Simulation Speed:</span>
+                        <input id="speedSlider" type="range" min="0.5" max="3" step="0.25" value="1" class="w-24 accent-blue-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer" oninput="updateSpeed(this.value)">
+                        <span id="speed-label" class="text-slate-300 font-mono text-[11px] w-8">1.0x</span>
+                    </div>
+
+                    <!-- Simulation Interactive Toggles -->
+                    <div class="flex items-center gap-4 text-slate-300">
+                        <label class="flex items-center gap-1.5 cursor-pointer hover:text-white transition">
+                            <input type="checkbox" id="chk-congestion" onchange="toggleCongestion(this.checked)" class="rounded bg-slate-800 border-slate-700 text-blue-600 focus:ring-0">
+                            <span>Simulate Congestion</span>
+                        </label>
+                        <label id="lbl-intercept" class="flex items-center gap-1.5 cursor-pointer hover:text-white transition">
+                            <input type="checkbox" id="chk-intercept" onchange="toggleInterception(this.checked)" class="rounded bg-slate-800 border-slate-700 text-amber-500 focus:ring-0">
+                            <span class="text-amber-400 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-user-secret text-xs"></i> Tapping / Interception Demo
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Payload & Controls Bar -->
+            <div class="p-4 bg-slate-900 rounded-2xl border border-slate-800 flex flex-wrap items-center gap-4">
+                <div class="flex-1 min-w-[220px]">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                        Message Payload Content
+                    </label>
+                    <div class="relative">
+                        <input type="text" id="payloadInput" value="CONFIDENTIAL FINANCIAL TRANSACTION DATA 2026" 
+                            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs font-mono text-blue-300 focus:outline-none focus:border-blue-500 transition-colors pr-16"
+                            placeholder="Type data payload..." maxlength="60">
+                        <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500" id="payload-length">46 chars</span>
+                    </div>
+                </div>
+
+                <div id="packet-split-control" class="hidden min-w-[140px]">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                        Packet Chunk Size
+                    </label>
+                    <select id="chunkSizeSelect" onchange="resetSimulation()" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500">
+                        <option value="6">6 Characters / Packet</option>
+                        <option value="10" selected>10 Characters / Packet</option>
+                        <option value="15">15 Characters / Packet</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Metrics, Tech Summary & Log Console (4 cols on lg) -->
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            
+            <!-- Real-time Telemetry Dashboard Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                    <h2 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-gauge-high text-blue-400"></i> Live Metrics Telemetry
+                    </h2>
+                    <span class="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5 mb-4">
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80">
+                        <div class="text-[10px] text-slate-400 font-medium">End-to-End Latency</div>
+                        <div id="metric-latency" class="text-sm font-mono font-bold text-slate-100 mt-0.5">0 ms</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80">
+                        <div class="text-[10px] text-slate-400 font-medium">Bandwidth Util.</div>
+                        <div id="metric-bandwidth" class="text-sm font-mono font-bold text-emerald-400 mt-0.5">0 %</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80">
+                        <div class="text-[10px] text-slate-400 font-medium">Node Buffer Storage</div>
+                        <div id="metric-buffer" class="text-sm font-mono font-bold text-amber-400 mt-0.5">0 KB</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80">
+                        <div class="text-[10px] text-slate-400 font-medium">Setup Overhead Delay</div>
+                        <div id="metric-setup" class="text-sm font-mono font-bold text-rose-400 mt-0.5">0 ms</div>
+                    </div>
+                </div>
+
+                <!-- Live Receiver Progress Bar -->
+                <div>
+                    <div class="flex justify-between text-xs font-mono text-slate-400 mb-1">
+                        <span>Receiver Data Reassembly</span>
+                        <span id="reassembly-pct" class="text-blue-400 font-bold">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800 p-0.5">
+                        <div id="reassembly-bar" class="bg-gradient-to-r from-blue-600 to-emerald-500 h-full w-0 rounded-full transition-all duration-300"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technique Feature Cards -->
+            <div id="tech-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex-1 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 id="tech-title" class="text-sm font-bold text-rose-400 flex items-center gap-2">
+                            Circuit Switching
+                        </h3>
+                        <span id="tech-tag" class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                            Physical Path
+                        </span>
+                    </div>
+                    <p id="tech-description" class="text-xs text-slate-300 leading-relaxed mb-3">
+                        Establishes a dedicated physical connection before communication starts. Once established, bandwidth is guaranteed and no buffering takes place.
+                    </p>
+                    
+                    <div class="space-y-1.5 text-xs text-slate-400 font-medium mb-3" id="tech-bullets">
+                        <!-- Dynamic Feature Bullets injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Event Console Log Box -->
+                <div class="bg-slate-950 rounded-xl p-3 border border-slate-800 font-mono text-[11px]">
+                    <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
+                        <span>Live Protocol Event Log</span>
+                        <span onclick="clearLogs()" class="hover:text-slate-300 cursor-pointer text-[10px]">Clear</span>
+                    </div>
+                    <div id="event-log" class="h-28 overflow-y-auto space-y-1 text-slate-400">
+                        <div class="text-slate-500">[System] Visualizer initialized. Select a technique or preset to begin.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Lower Educational Section: Side-by-Side Architectural Matrix -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <h3 class="text-sm font-bold text-slate-100 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-table text-blue-400"></i> Comparative Breakdown Matrix
+            </h3>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left text-slate-300">
+                    <thead class="text-[11px] uppercase bg-slate-950/80 text-slate-400 border-b border-slate-800">
+                        <tr>
+                            <th class="py-3 px-4 rounded-l-lg">Feature Metric</th>
+                            <th class="py-3 px-4 text-rose-400">Circuit Switching</th>
+                            <th class="py-3 px-4 text-amber-400">Message Switching</th>
+                            <th class="py-3 px-4 text-emerald-400">Packet Switching</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60 font-mono text-[11px]">
+                        <tr class="hover:bg-slate-800/30">
+                            <td class="py-2.5 px-4 font-semibold text-slate-200 font-sans">Connection Setup</td>
+                            <td class="py-2.5 px-4 text-rose-300">Required prior to data flow</td>
+                            <td class="py-2.5 px-4 text-slate-400">Not required</td>
+                            <td class="py-2.5 px-4 text-emerald-300">Not required (Connectionless)</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/30">
+                            <td class="py-2.5 px-4 font-semibold text-slate-200 font-sans">Switch Store & Forward</td>
+                            <td class="py-2.5 px-4 text-slate-400">None (Direct wire bypass)</td>
+                            <td class="py-2.5 px-4 text-amber-400">High (Stores full message)</td>
+                            <td class="py-2.5 px-4 text-emerald-400">Minimal (Stores small chunks)</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/30">
+                            <td class="py-2.5 px-4 font-semibold text-slate-200 font-sans">Interception Vulnerability</td>
+                            <td class="py-2.5 px-4 text-slate-300">Requires physical tap</td>
+                            <td class="py-2.5 px-4 text-amber-400 font-bold">High at middle switches</td>
+                            <td class="py-2.5 px-4 text-emerald-300">Mitigated via Encryption</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/30">
+                            <td class="py-2.5 px-4 font-semibold text-slate-200 font-sans">Efficiency for Bursty Data</td>
+                            <td class="py-2.5 px-4 text-slate-400">Low (Wasted reserved path)</td>
+                            <td class="py-2.5 px-4 text-slate-400">Moderate</td>
+                            <td class="py-2.5 px-4 text-emerald-400 font-bold">High (Dynamic bandwidth)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Onboarding Help Modal -->
+    <div id="help-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="closeHelpModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-graduation-cap text-blue-400"></i> How To Use This Simulator
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                This interactive tool simulates how data moves across computer networks using different switching strategies.
+            </p>
+
+            <div class="space-y-3 text-xs text-slate-300 mb-6">
+                <div class="flex gap-3 items-start">
+                    <div class="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 font-bold font-mono">1</div>
+                    <div>
+                        <strong class="text-white block">Choose a Switching Technique:</strong>
+                        Select Circuit, Message, Packet, or MAC Table from the top bar or pick a <em>Quick Preset</em>.
+                    </div>
+                </div>
+                <div class="flex gap-3 items-start">
+                    <div class="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 font-bold font-mono">2</div>
+                    <div>
+                        <strong class="text-white block">Interact with the Topology Canvas:</strong>
+                        Drag any switch or computer node with your mouse/touch to re-arrange the layout. Hover over any node to inspect its internal memory buffer and routing tables!
+                    </div>
+                </div>
+                <div class="flex gap-3 items-start">
+                    <div class="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 font-bold font-mono">3</div>
+                    <div>
+                        <strong class="text-white block">Test Interception / Tapping:</strong>
+                        Enable <em>"Tapping / Interception Demo"</em> to see how intermediate nodes in Message Switching can inspect confidential payloads mid-transit!
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="closeHelpModal()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition">
+                Got It, Let's Explore!
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Canvas & UI State Management
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let currentType = 'circuit'; // 'circuit', 'message', 'packet', 'mactable'
+        let isRunning = false;
+        let isPaused = false;
+        let animFrameId = null;
+        let simSpeed = 1.0;
+        let enableCongestion = false;
+        let enableInterception = false;
+        let audioEnabled = true;
+
+        // Interactive Canvas State
+        let nodes = [];
+        let links = [];
+        let activePackets = [];
+        let draggedNode = null;
+        let hoveredNode = null;
+        let dragOffsetX = 0, dragOffsetY = 0;
+
+        // Metrics & Timing
+        let startTime = 0;
+        let totalReceivedBytes = 0;
+        let currentPayload = "";
+
+        // Web Audio Synthesizer setup for audio cues
+        let audioCtx = null;
+        function playBeep(freq = 440, duration = 0.08, type = 'sine') {
+            if (!audioEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const btn = document.getElementById('btn-audio');
+            const icon = document.getElementById('audio-icon');
+            const label = document.getElementById('audio-label');
+            if (audioEnabled) {
+                icon.className = "fa-solid fa-volume-high text-slate-300";
+                label.innerText = "Audio On";
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-slate-500";
+                label.innerText = "Audio Muted";
+            }
+        }
+
+        // Initialize Topology Nodes & Links
+        function initNodeTopology() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const w = rect.width;
+            const h = rect.height;
+
+            // Default balanced node topology
+            nodes = [
+                { id: 'SRC', label: 'Sender (PC A)', x: w * 0.12, y: h * 0.5, type: 'host', mac: 'AA:AA:AA:11', buffer: [] },
+                { id: 'SW1', label: 'Switch 1', x: w * 0.35, y: h * 0.3, type: 'switch', mac: '10:00:00:01', buffer: [] },
+                { id: 'SW2', label: 'Switch 2', x: w * 0.35, y: h * 0.7, type: 'switch', mac: '10:00:00:02', buffer: [] },
+                { id: 'SW3', label: 'Switch 3 (Tap Node)', x: w * 0.65, y: h * 0.3, type: 'switch', mac: '10:00:00:03', buffer: [], intercepted: false },
+                { id: 'SW4', label: 'Switch 4', x: w * 0.65, y: h * 0.7, type: 'switch', mac: '10:00:00:04', buffer: [] },
+                { id: 'DST', label: 'Receiver (PC B)', x: w * 0.88, y: h * 0.5, type: 'host', mac: 'BB:BB:BB:22', buffer: [] }
+            ];
+
+            links = [
+                { from: 'SRC', to: 'SW1', reserved: false },
+                { from: 'SRC', to: 'SW2', reserved: false },
+                { from: 'SW1', to: 'SW3', reserved: false },
+                { from: 'SW1', to: 'SW4', reserved: false },
+                { from: 'SW2', to: 'SW4', reserved: false },
+                { from: 'SW3', to: 'DST', reserved: false },
+                { from: 'SW4', to: 'DST', reserved: false }
+            ];
+        }
+
+        function setSwitchingType(type) {
+            resetSimulation();
+            currentType = type;
+
+            ['circuit', 'message', 'packet', 'mactable'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === type) {
+                    btn.className = "px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 font-bold text-white shadow-md bg-slate-800 border border-slate-700";
+                } else {
+                    btn.className = "px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 text-slate-400 hover:text-white";
+                }
+            });
+
+            const badge = document.getElementById('current-badge');
+            const title = document.getElementById('tech-title');
+            const desc = document.getElementById('tech-description');
+            const bullets = document.getElementById('tech-bullets');
+            const splitControl = document.getElementById('packet-split-control');
+
+            splitControl.classList.toggle('hidden', type !== 'packet');
+
+            if (type === 'circuit') {
+                badge.className = "px-2.5 py-1 text-xs font-semibold rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1.5";
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> Circuit Switching`;
+                title.className = "text-sm font-bold text-rose-400 flex items-center gap-2";
+                title.innerText = "Circuit Switching";
+                desc.innerText = "Reserves a continuous physical path between Sender and Receiver. Signals handshake first, establishing zero-buffer streaming.";
+                bullets.innerHTML = `
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-rose-500 text-[10px]"></i> Dedicated line reserved end-to-end</div>
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-rose-500 text-[10px]"></i> Mandatory call setup delay upfront</div>
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-rose-500 text-[10px]"></i> Guaranteed real-time voice/video bandwidth</div>
+                `;
+                updateStepBanner("INSTRUCTION", "Circuit Switching selected. Click 'Start Transmission' to see call setup handshake.", "fa-network-wired");
+            } else if (type === 'message') {
+                badge.className = "px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5";
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Message Switching`;
+                title.className = "text-sm font-bold text-amber-400 flex items-center gap-2";
+                title.innerText = "Message Switching";
+                desc.innerText = "Sends the entire payload block hop-by-hop. Switches must receive, store, and buffer the full message before forwarding.";
+                bullets.innerHTML = `
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-amber-500 text-[10px]"></i> Store-and-Forward mechanism at every switch</div>
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-amber-500 text-[10px]"></i> High switch memory requirement</div>
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-amber-500 text-[10px]"></i> Vulnerable to intermediate node tapping/eavesdropping</div>
+                `;
+                updateStepBanner("INSTRUCTION", "Message Switching selected. Enable 'Tapping Demo' to observe mid-way interception.", "fa-user-secret");
+            } else if (type === 'packet') {
+                badge.className = "px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5";
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Packet Switching`;
+                title.className = "text-sm font-bold text-emerald-400 flex items-center gap-2";
+                title.innerText = "Packet Switching";
+                desc.innerText = "Chops message into small independent packets. Each packet routes dynamically, avoiding congested switches and reassembling at destination.";
+                bullets.innerHTML = `
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500 text-[10px]"></i> Optimal link bandwidth sharing</div>
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500 text-[10px]"></i> Dynamic path routing around network bottlenecks</div>
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500 text-[10px]"></i> Sequence numbering for out-of-order reassembly</div>
+                `;
+                updateStepBanner("INSTRUCTION", "Packet Switching selected. Click 'Start Transmission' to see packets route dynamically.", "fa-box");
+            } else if (type === 'mactable') {
+                badge.className = "px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center gap-1.5";
+                badge.innerHTML = `<i class="fa-solid fa-table-list text-xs"></i> Switch MAC Learning`;
+                title.className = "text-sm font-bold text-blue-400 flex items-center gap-2";
+                title.innerText = "MAC Address Table Learning";
+                desc.innerText = "Demonstrates how a physical switch learns MAC addresses on incoming ports to eliminate broadcast flooding.";
+                bullets.innerHTML = `
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-blue-400 text-[10px]"></i> Ingests Source MAC from incoming frames</div>
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-blue-400 text-[10px]"></i> Floods all ports when Destination MAC is unknown</div>
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-blue-400 text-[10px]"></i> Unicasts directly once target MAC port is learned</div>
+                `;
+                updateStepBanner("INSTRUCTION", "MAC Learning selected. Watch Switch 1 flood unknown frames then index Port 1.", "fa-table-list");
+            }
+
+            logEvent(`Switched mode to: ${type.toUpperCase()}`);
+        }
+
+        // Quick Preset Configurations
+        function loadPreset(presetName) {
+            if (presetName === 'phone') {
+                setSwitchingType('circuit');
+                document.getElementById('payloadInput').value = "VOICE CALL AUDIO STREAM (64 Kbps PCM)";
+                startSimulation();
+            } else if (presetName === 'telegraph') {
+                setSwitchingType('message');
+                document.getElementById('chk-intercept').checked = true;
+                toggleInterception(true);
+                document.getElementById('payloadInput').value = "SECRET TELEGRAM: TRANSFER FUNDS IMMEDIATELY";
+                startSimulation();
+            } else if (presetName === 'web') {
+                setSwitchingType('packet');
+                document.getElementById('chk-congestion').checked = true;
+                toggleCongestion(true);
+                document.getElementById('payloadInput').value = "HTTPS GET /index.html REQUEST PACKETS";
+                startSimulation();
+            }
+        }
+
+        // --- STREAMING & SIMULATION CONTROLS ---
+        function startSimulation() {
+            if (isRunning && isPaused) {
+                isPaused = false;
+                document.getElementById('btn-pause').innerHTML = `<i class="fa-solid fa-pause"></i> Pause`;
+                return;
+            }
+
+            resetSimulation();
+            isRunning = true;
+            startTime = performance.now();
+            currentPayload = document.getElementById('payloadInput').value.trim() || "CONFIDENTIAL DATA STREAM";
+
+            document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-pause').disabled = false;
+
+            if (currentType === 'circuit') {
+                initCircuitSetup();
+            } else if (currentType === 'message') {
+                initMessageTransmission();
+            } else if (currentType === 'packet') {
+                initPacketTransmission();
+            } else if (currentType === 'mactable') {
+                initMacTableDemo();
+            }
+        }
+
+        function togglePause() {
+            if (!isRunning) return;
+            isPaused = !isPaused;
+            const btn = document.getElementById('btn-pause');
+            btn.innerHTML = isPaused ? `<i class="fa-solid fa-play"></i> Resume` : `<i class="fa-solid fa-pause"></i> Pause`;
+            logEvent(isPaused ? "Simulation paused" : "Simulation resumed");
+        }
+
+        function resetSimulation() {
+            isRunning = false;
+            isPaused = false;
+            activePackets = [];
+            totalReceivedBytes = 0;
+            
+            links.forEach(l => l.reserved = false);
+            nodes.forEach(n => {
+                n.buffer = [];
+                n.intercepted = false;
+            });
+
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('btn-pause').disabled = true;
+            document.getElementById('btn-pause').innerHTML = `<i class="fa-solid fa-pause"></i> Pause`;
+            
+            document.getElementById('metric-latency').innerText = `0 ms`;
+            document.getElementById('metric-bandwidth').innerText = `0 %`;
+            document.getElementById('metric-buffer').innerText = `0 KB`;
+            document.getElementById('metric-setup').innerText = `0 ms`;
+            document.getElementById('reassembly-bar').style.width = `0%`;
+            document.getElementById('reassembly-pct').innerText = `0%`;
+            document.getElementById('status-indicator').innerText = `Status: Ready`;
+
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            requestAnimationFrame(renderLoop);
+        }
+
+        // --- PROTOCOL HANDLERS ---
+        function initCircuitSetup() {
+            updateStepBanner("PHASE 1: HANDSHAKE", "Sending Call Setup control probe to establish dedicated circuit path.", "fa-phone");
+            document.getElementById('status-indicator').innerText = `Status: Reserving Circuit...`;
+            document.getElementById('metric-setup').innerText = `140 ms`;
+            logEvent("Phase 1: Dispatching Call Setup probe signal...");
+
+            activePackets.push({
+                id: 'SETUP',
+                type: 'control',
+                src: 'SRC',
+                dst: 'DST',
+                path: ['SRC', 'SW1', 'SW3', 'DST'],
+                pathIndex: 0,
+                progress: 0,
+                color: '#f43f5e',
+                size: 8
+            });
+            playBeep(520, 0.1, 'triangle');
+        }
+
+        function initMessageTransmission() {
+            updateStepBanner("PHASE 1: STORE & FORWARD", "Sending full message payload block to intermediate Switch 1.", "fa-box-archive");
+            document.getElementById('status-indicator').innerText = `Status: Store-and-Forwarding...`;
+            logEvent(`Initiating ${currentPayload.length} byte Message block transmission.`);
+
+            const targetPath = enableCongestion ? ['SRC', 'SW2', 'SW4', 'DST'] : ['SRC', 'SW1', 'SW3', 'DST'];
+
+            activePackets.push({
+                id: 'MSG-BLOCK',
+                type: 'full-message',
+                data: currentPayload,
+                src: 'SRC',
+                dst: 'DST',
+                path: targetPath,
+                pathIndex: 0,
+                progress: 0,
+                storingAtNode: null,
+                storeProgress: 0,
+                color: '#f59e0b',
+                size: 18
+            });
+            playBeep(400, 0.12, 'square');
+        }
+
+        function initPacketTransmission() {
+            const chunkSize = parseInt(document.getElementById('chunkSizeSelect').value) || 10;
+            let chunks = [];
+            for (let i = 0; i < currentPayload.length; i += chunkSize) {
+                chunks.push(currentPayload.substring(i, i + chunkSize));
+            }
+
+            updateStepBanner("PHASE 1: SEGMENTATION", `Divided message into ${chunks.length} independent packets. Dispatching across alternate paths.`, "fa-boxes-stacked");
+            document.getElementById('status-indicator').innerText = `Status: Dispatching Packets...`;
+            logEvent(`Segmented payload into ${chunks.length} discrete packets.`);
+
+            chunks.forEach((chunk, index) => {
+                let path = (index % 2 === 0 || enableCongestion) 
+                    ? ['SRC', 'SW2', 'SW4', 'DST'] 
+                    : ['SRC', 'SW1', 'SW3', 'DST'];
+
+                activePackets.push({
+                    id: `PKT-${index + 1}`,
+                    seq: index + 1,
+                    total: chunks.length,
+                    data: chunk,
+                    src: 'SRC',
+                    dst: 'DST',
+                    path: path,
+                    pathIndex: 0,
+                    progress: -index * 0.35,
+                    color: '#10b981',
+                    size: 11
+                });
+            });
+        }
+
+        function initMacTableDemo() {
+            updateStepBanner("PHASE 1: FLOODING", "PC A sends frame to unknown MAC BB:BB:BB:22. Switch 1 floods frame to learn port.", "fa-network-wired");
+            document.getElementById('status-indicator').innerText = `Status: Broadcast Flooding...`;
+            logEvent("PC A sends frame to unknown MAC BB:BB:BB:22.");
+
+            activePackets.push({
+                id: 'FRAME-1',
+                type: 'mac-learn',
+                srcMac: 'AA:AA:AA:11',
+                dstMac: 'BB:BB:BB:22',
+                path: ['SRC', 'SW1'],
+                pathIndex: 0,
+                progress: 0,
+                color: '#3b82f6',
+                size: 12
+            });
+        }
+
+        // --- PHYSICS & ANIMATION TICK ---
+        function updatePhysics(dt) {
+            if (!isRunning || isPaused) return;
+
+            const effectiveSpeed = dt * 0.001 * simSpeed * 1.6;
+
+            for (let i = activePackets.length - 1; i >= 0; i--) {
+                let pkt = activePackets[i];
+
+                if (pkt.progress < 0) {
+                    pkt.progress += effectiveSpeed;
+                    continue;
+                }
+
+                // Intermediate Switch Buffer Store & Forward Logic
+                if (pkt.storingAtNode) {
+                    pkt.storeProgress += effectiveSpeed * 1.2;
+                    document.getElementById('metric-buffer').innerText = `${(pkt.data.length * 1.5).toFixed(1)} KB`;
+
+                    if (enableInterception && pkt.storingAtNode === 'SW3') {
+                        const sw3 = nodes.find(n => n.id === 'SW3');
+                        sw3.intercepted = true;
+                        updateStepBanner("SECURITY ALERT: TAPPED!", `Switch 3 (Interception Node) grabbed payload: "${pkt.data}"!`, "fa-user-secret");
+                        logEvent(`⚠️ SECURITY ALERT: Intermediate Switch 3 tapped message payload!`);
+                        playBeep(220, 0.25, 'sawtooth');
+                    }
+
+                    if (pkt.storeProgress >= 1.0) {
+                        const storedNode = pkt.storingAtNode;
+                        pkt.storingAtNode = null;
+                        pkt.storeProgress = 0;
+                        pkt.pathIndex++;
+                        pkt.progress = 0;
+                        logEvent(`Switch ${storedNode} completed buffer storage and forwarded message to next hop.`);
+                        playBeep(600, 0.08, 'sine');
+                    }
+                    continue;
+                }
+
+                pkt.progress += effectiveSpeed;
+
+                if (pkt.progress >= 1.0) {
+                    pkt.pathIndex++;
+                    pkt.progress = 0;
+
+                    if (pkt.pathIndex >= pkt.path.length - 1) {
+                        handlePacketArrival(pkt, i);
+                    } else if (currentType === 'message' && pkt.type === 'full-message') {
+                        pkt.storingAtNode = pkt.path[pkt.pathIndex];
+                        pkt.storeProgress = 0;
+                        updateStepBanner("PHASE 2: BUFFERING", `Switch ${pkt.storingAtNode} receiving & storing whole message block in memory buffer.`, "fa-hard-drive");
+                        logEvent(`Switch ${pkt.storingAtNode} storing message in memory buffer...`);
+                        playBeep(350, 0.1, 'triangle');
+                    } else {
+                        playBeep(480 + (pkt.seq || 1) * 20, 0.05, 'sine');
+                    }
+                }
+            }
+
+            if (isRunning) {
+                const elapsed = (performance.now() - startTime).toFixed(0);
+                document.getElementById('metric-latency').innerText = `${elapsed} ms`;
+                
+                let activeCount = activePackets.filter(p => p.progress > 0).length;
+                document.getElementById('metric-bandwidth').innerText = `${Math.min(100, activeCount * 25)} %`;
+            }
+        }
+
+        function handlePacketArrival(pkt, index) {
+            if (pkt.id === 'SETUP') {
+                activePackets.splice(index, 1);
+                
+                links.forEach(l => {
+                    if ((l.from === 'SRC' && l.to === 'SW1') ||
+                        (l.from === 'SW1' && l.to === 'SW3') ||
+                        (l.from === 'SW3' && l.to === 'DST')) {
+                        l.reserved = true;
+                    }
+                });
+
+                updateStepBanner("PHASE 2: DEDICATED STREAM", "Physical circuit reserved! Zero intermediate buffering delay during stream.", "fa-circle-check");
+                logEvent("✅ Physical Circuit Reserved! Streaming continuous data stream...");
+                document.getElementById('status-indicator').innerText = `Status: Circuit Active (Streaming)`;
+                playBeep(880, 0.2, 'sine');
+
+                for (let j = 0; j < 12; j++) {
+                    activePackets.push({
+                        id: `STREAM-${j}`,
+                        type: 'stream',
+                        path: ['SRC', 'SW1', 'SW3', 'DST'],
+                        pathIndex: 0,
+                        progress: -j * 0.14,
+                        color: '#f43f5e',
+                        size: 7
+                    });
+                }
+            } else if (currentType === 'packet') {
+                totalReceivedBytes += pkt.data.length;
+                activePackets.splice(index, 1);
+
+                const pct = Math.min(100, Math.round((totalReceivedBytes / currentPayload.length) * 100));
+                document.getElementById('reassembly-bar').style.width = `${pct}%`;
+                document.getElementById('reassembly-pct').innerText = `${pct}%`;
+                logEvent(`Received Packet #${pkt.seq}: "${pkt.data}"`);
+
+                if (activePackets.length === 0) {
+                    updateStepBanner("COMPLETE", "All packets successfully received, ordered, and reassembled!", "fa-circle-check");
+                    logEvent("🎉 All Packets Received & Reassembled!");
+                    document.getElementById('status-indicator').innerText = `Status: Complete`;
+                    playBeep(1046, 0.3, 'sine');
+                }
+            } else if (currentType === 'message') {
+                activePackets.splice(index, 1);
+                document.getElementById('reassembly-bar').style.width = `100%`;
+                document.getElementById('reassembly-pct').innerText = `100%`;
+                updateStepBanner("COMPLETE", "Full message block received by destination host!", "fa-circle-check");
+                logEvent("🎉 Entire Message Received successfully!");
+                document.getElementById('status-indicator').innerText = `Status: Complete`;
+                playBeep(987, 0.3, 'sine');
+            } else if (pkt.type === 'stream') {
+                activePackets.splice(index, 1);
+                totalReceivedBytes += 4;
+                const pct = Math.min(100, Math.round((totalReceivedBytes / currentPayload.length) * 100));
+                document.getElementById('reassembly-bar').style.width = `${pct}%`;
+                document.getElementById('reassembly-pct').innerText = `${pct}%`;
+
+                if (activePackets.length === 0) {
+                    updateStepBanner("COMPLETE", "Circuit call stream session ended. Tearing down connection.", "fa-circle-check");
+                    logEvent("Circuit Call Session Ended. Tearing down reserved circuit.");
+                    links.forEach(l => l.reserved = false);
+                    document.getElementById('status-indicator').innerText = `Status: Complete`;
+                }
+            } else if (currentType === 'mactable') {
+                activePackets.splice(index, 1);
+                updateStepBanner("MAC LEARNED", "Switch 1 learned MAC: AA:AA:AA:11 is on Port 1. Future frames bypass flooding!", "fa-table-list");
+                logEvent("Switch 1 learned MAC: AA:AA:AA:11 -> Port 1");
+                document.getElementById('status-indicator').innerText = `Status: MAC Table Indexed`;
+                playBeep(784, 0.2, 'sine');
+            }
+        }
+
+        // --- CANVAS RENDER LOOP ---
+        function renderLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Draw Connection Links
+            links.forEach(link => {
+                const srcNode = nodes.find(n => n.id === link.from);
+                const dstNode = nodes.find(n => n.id === link.to);
+
+                ctx.beginPath();
+                ctx.moveTo(srcNode.x, srcNode.y);
+                ctx.lineTo(dstNode.x, dstNode.y);
+
+                if (link.reserved) {
+                    ctx.strokeStyle = '#f43f5e';
+                    ctx.lineWidth = 5;
+                    ctx.shadowColor = 'rgba(244, 63, 94, 0.8)';
+                    ctx.shadowBlur = 12;
+                } else if (enableCongestion && (link.from === 'SW1' && link.to === 'SW3')) {
+                    ctx.strokeStyle = '#ef4444';
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([5, 5]);
+                } else {
+                    ctx.strokeStyle = '#334155';
+                    ctx.lineWidth = 2.5;
+                    ctx.setLineDash([]);
+                    ctx.shadowBlur = 0;
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.shadowBlur = 0;
+            });
+
+            // 2. Draw Switch & Host Nodes
+            nodes.forEach(node => {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 22, 0, Math.PI * 2);
+
+                let isHovered = hoveredNode === node;
+
+                if (node.type === 'host') {
+                    ctx.fillStyle = isHovered ? '#2563eb' : '#1e293b';
+                    ctx.strokeStyle = '#3b82f6';
+                } else {
+                    ctx.fillStyle = node.intercepted ? '#78350f' : (isHovered ? '#334155' : '#0f172a');
+                    ctx.strokeStyle = node.intercepted ? '#f59e0b' : '#64748b';
+                }
+                
+                ctx.lineWidth = isHovered ? 4 : 3;
+                ctx.fill();
+                ctx.stroke();
+
+                // Node Title Text
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = '600 11px Inter';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(node.id, node.x, node.y);
+
+                // Subtitle Label
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '10px Inter';
+                ctx.fillText(node.label, node.x, node.y + 34);
+
+                // Intercept Tapped Badge
+                if (node.intercepted) {
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.font = 'bold 9px Inter';
+                    ctx.fillText('⚠️ TAPPED', node.x, node.y - 30);
+                }
+
+                ctx.restore();
+            });
+
+            // 3. Draw Active Packets & Store-and-Forward Rings
+            activePackets.forEach(pkt => {
+                if (pkt.progress < 0) return;
+
+                let pos = getPacketPosition(pkt);
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, pkt.size, 0, Math.PI * 2);
+                ctx.fillStyle = pkt.color;
+                ctx.shadowColor = pkt.color;
+                ctx.shadowBlur = 12;
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 9px Fira Code';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(pkt.seq ? `P${pkt.seq}` : 'DATA', pos.x, pos.y);
+
+                // Store & Forward Progress Loading Ring around Switch Node
+                if (pkt.storingAtNode) {
+                    ctx.beginPath();
+                    ctx.arc(pos.x, pos.y, pkt.size + 8, 0, Math.PI * 2 * pkt.storeProgress);
+                    ctx.strokeStyle = '#f59e0b';
+                    ctx.lineWidth = 3.5;
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+            });
+
+            updatePhysics(16);
+            animFrameId = requestAnimationFrame(renderLoop);
+        }
+
+        function getPacketPosition(pkt) {
+            const srcId = pkt.path[pkt.pathIndex];
+            const dstId = pkt.path[pkt.pathIndex + 1] || srcId;
+
+            const n1 = nodes.find(n => n.id === srcId);
+            const n2 = nodes.find(n => n.id === dstId);
+
+            if (pkt.storingAtNode) {
+                const storeNode = nodes.find(n => n.id === pkt.storingAtNode);
+                return { x: storeNode.x, y: storeNode.y };
+            }
+
+            return {
+                x: n1.x + (n2.x - n1.x) * pkt.progress,
+                y: n1.y + (n2.y - n1.y) * pkt.progress
+            };
+        }
+
+        // --- INTERACTIVE DRAG & INSPECT EVENT LISTENERS ---
+        function setupCanvasInteractions() {
+            canvas.addEventListener('mousedown', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                nodes.forEach(n => {
+                    const dist = Math.hypot(n.x - mouseX, n.y - mouseY);
+                    if (dist < 25) {
+                        draggedNode = n;
+                        dragOffsetX = mouseX - n.x;
+                        dragOffsetY = mouseY - n.y;
+                    }
+                });
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                if (draggedNode) {
+                    draggedNode.x = mouseX - dragOffsetX;
+                    draggedNode.y = mouseY - dragOffsetY;
+                }
+
+                // Check for hover inspector
+                let foundHover = null;
+                nodes.forEach(n => {
+                    const dist = Math.hypot(n.x - mouseX, n.y - mouseY);
+                    if (dist < 25) foundHover = n;
+                });
+
+                hoveredNode = foundHover;
+                const inspector = document.getElementById('node-inspector');
+
+                if (hoveredNode) {
+                    inspector.classList.remove('hidden');
+                    inspector.style.left = `${hoveredNode.x + 30}px`;
+                    inspector.style.top = `${hoveredNode.y - 20}px`;
+
+                    document.getElementById('inspect-title').innerHTML = `<i class="fa-solid fa-server text-blue-400"></i> ${hoveredNode.label}`;
+                    document.getElementById('inspect-mac').innerText = `MAC: ${hoveredNode.mac}`;
+                    
+                    document.getElementById('inspect-body').innerHTML = `
+                        <div>Type: <span class="text-slate-100">${hoveredNode.type.toUpperCase()}</span></div>
+                        <div>Memory Buffer: <span class="text-amber-400">${hoveredNode.buffer.length ? hoveredNode.buffer.length + ' KB' : 'Empty'}</span></div>
+                        <div>Tapped Status: <span class="${hoveredNode.intercepted ? 'text-rose-400 font-bold' : 'text-emerald-400'}">${hoveredNode.intercepted ? 'YES (Compromised)' : 'Secure'}</span></div>
+                    `;
+                } else {
+                    inspector.classList.add('hidden');
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                draggedNode = null;
+            });
+        }
+
+        // --- UI HELPERS & LOGGING ---
+        function updateStepBanner(phase, text, iconClass) {
+            document.getElementById('step-phase').innerText = phase;
+            document.getElementById('step-text').innerText = text;
+            document.getElementById('step-icon').className = `fa-solid ${iconClass}`;
+        }
+
+        function logEvent(msg) {
+            const consoleBox = document.getElementById('event-log');
+            const time = new Date().toLocaleTimeString().split(' ')[0];
+            const entry = document.createElement('div');
+            entry.className = "text-slate-300 border-l-2 border-blue-500 pl-2 py-0.5 my-1 text-[11px]";
+            entry.innerHTML = `<span class="text-slate-500 font-mono">[${time}]</span> ${msg}`;
+            consoleBox.appendChild(entry);
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('event-log').innerHTML = '';
+        }
+
+        function updateSpeed(val) {
+            simSpeed = parseFloat(val);
+            document.getElementById('speed-label').innerText = `${simSpeed.toFixed(1)}x`;
+        }
+
+        function toggleCongestion(checked) {
+            enableCongestion = checked;
+            logEvent(checked ? "Link Congestion enabled on Switch 1 -> Switch 3 link!" : "Congestion cleared.");
+        }
+
+        function toggleInterception(checked) {
+            enableInterception = checked;
+            if (!checked) nodes.forEach(n => n.intercepted = false);
+            logEvent(checked ? "Intermediate Tapping enabled on Switch 3!" : "Tapping disabled.");
+        }
+
+        function openHelpModal() {
+            document.getElementById('help-modal').classList.remove('hidden');
+        }
+
+        function closeHelpModal() {
+            document.getElementById('help-modal').classList.add('hidden');
+        }
+
+        document.getElementById('payloadInput').addEventListener('input', (e) => {
+            document.getElementById('payload-length').innerText = `${e.target.value.length} chars`;
+        });
+
+        // Window Load & Setup
+        window.onload = function() {
+            initNodeTopology();
+            setupCanvasInteractions();
+            window.addEventListener('resize', initNodeTopology);
+            setSwitchingType('circuit');
+        };
+    </script>
+</body>
+</html>

@@ -75,7 +75,7 @@ function renderToolsStatus(message, isError = false) {
 
 function renderToolVisual(tool) {
     if (tool.image_url) {
-        return `<img src="${escapeHTML(tool.image_url)}" alt="${escapeHTML(tool.name || 'Tool logo')}" class="w-24 h-24 object-contain" loading="lazy" />`;
+        return `<img src="${escapeHTML(tool.image_url)}" alt="${escapeHTML(tool.name || 'Tool logo')}" class="w-150 h-200 object-contain" loading="lazy" />`;
     }
 
     return `<span class="material-icons text-primary text-7xl">${escapeHTML(tool.icon || 'build')}</span>`;

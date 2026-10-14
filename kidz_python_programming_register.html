@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kidz Python Programming - Examfriendly</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --brand-orange: #ff6600;
+            --brand-orange-hover: #e05500;
+            --brand-orange-light: #fff4ec;
+            --brand-blue: #00a8e8;
+            --brand-blue-dark: #0077b6;
+            --brand-blue-deep: #03045e;
+            --bg-gradient: linear-gradient(135deg, #e6f7ff 0%, #fff3eb 100%);
+            --card-radius: 1.25rem;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-gradient);
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        .brand-header {
+            background: #ffffff;
+            border-bottom: 3px solid var(--brand-orange);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-box {
+            border: 2px dashed var(--white);
+            background: var(--white);
+            padding: 0.2rem 1rem;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .hero-card {
+            background: linear-gradient(135deg, var(--brand-blue-deep) 0%, var(--brand-blue-dark) 60%, var(--brand-blue) 100%);
+            color: #ffffff;
+            border-radius: var(--card-radius);
+            box-shadow: 0 12px 35px rgba(0, 120, 183, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 350px;
+            height: 350px;
+            background: rgba(255, 102, 0, 0.15);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .form-card {
+            background: #ffffff;
+            border-radius: var(--card-radius);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-badge {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 0.75rem;
+            padding: 0.85rem 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-badge:hover {
+            background: rgba(255, 255, 255, 0.22);
+            transform: translateY(-2px);
+        }
+
+        .section-header {
+            border-left: 4px solid var(--brand-orange);
+            padding-left: 0.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--brand-blue-deep);
+            font-weight: 700;
+        }
+
+        .form-control, .form-select {
+            border-radius: 0.6rem;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #cbd5e1;
+            font-weight: 500;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--brand-blue);
+            box-shadow: 0 0 0 0.25rem rgba(0, 168, 232, 0.2);
+        }
+
+        .slot-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 0.85rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .slot-card:hover {
+            border-color: var(--brand-blue);
+            background-color: #f0f9ff;
+        }
+
+        .btn-check:checked + .slot-card {
+            border-color: var(--brand-orange);
+            background-color: var(--brand-orange-light);
+            box-shadow: 0 4px 14px rgba(255, 102, 0, 0.15);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--brand-orange) 0%, #e05500 100%);
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.9rem 2rem;
+            border-radius: 0.75rem;
+            border: none;
+            box-shadow: 0 6px 20px rgba(255, 102, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 102, 0, 0.45);
+            color: #ffffff;
+            background: linear-gradient(135deg, #ff751a 0%, #cc4c00 100%);
+        }
+
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 0.3rem;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 1.8rem;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: var(--brand-orange);
+        }
+
+        .conditional-box {
+            transition: all 0.35s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .conditional-box.visible {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body class="pb-5">
+
+    <nav class="brand-header py-3 mb-4">
+        <div class="container d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="logo-box">
+                    
+                    <div class="lh-1">
+                        <span class="fw-extrabold fs-4" style="color: var(--brand-blue-deep); letter-spacing: -0.5px;"><span class="fw-extrabold fs-4" style="color: var(--brand-orange);"></span>
+<div class="mt-1">
+                            <img src="Artboard 1.png" alt="Examfriendly Logo" style="max-height: 32px; width: auto; object-fit: contain;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero-card p-4 p-md-5 mb-4">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                        <span class="badge text-white fw-bold px-3 py-2 rounded-pill fs-6" style="background-color: var(--brand-orange);">
+                            <i class="bi bi-code-slash me-1"></i> Ages 10–15 Years
+                        </span>
+                        <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill fs-6">
+                            <i class="bi bi-play-circle-fill me-1"></i> 1st Class is Demo
+                        </span>
+                        <span class="badge bg-light text-dark fw-bold px-3 py-2 rounded-pill fs-6">
+                            <i class="bi bi-calendar3 me-1"></i> Starts 25th Oct • 1 Month
+                        </span>
+                    </div>
+                    <h1 class="display-5 fw-extrabold mb-3">Kidz Python Programming</h1>
+                    <p class="lead text-light opacity-90 mb-3">
+                        Turn your child's curiosity into coding skills! 🚀
+                        Our Kidz Python Programming Course is designed for children aged 10–15 years, making coding fun, visual, and easy to understand—even for complete beginners!
+                    </p>
+                    <p class="text-light opacity-75 mb-3">
+                        Instead of jumping straight into writing code, children first understand programming concepts visually through fun activities and games involving dice, numbers, and logical challenges. Concepts like IF-ELSE statements, loops, and decision-making become easier to grasp when children can see how they work in real-life situations.
+                    </p>
+                    
+                    <div class="p-3 bg-white bg-opacity-10 border border-white border-opacity-25 rounded-3 text-light mb-4">
+                        <p class="mb-1 fw-bold text-warning"><i class="bi bi-info-circle-fill me-2"></i>Course Details & Demo Class Info:</p>
+                        <ul class="mb-0 ps-3 small opacity-90">
+                            <li><strong>1st Class is Demo:</strong> The very first class of the course will be conducted as a free demo session for kids to experience interactive learning firsthand.</li>
+                            <li><strong>1 Month Initial Duration:</strong> This is a 1-month course initially, and you can easily extend it based on your child's interest and progress.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center d-none d-lg-block">
+                    <div class="p-4 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-25 shadow">
+                        <div class="p-3 bg-white text-dark rounded-circle d-inline-block mb-3 shadow">
+                            <i class="bi bi-controller display-3" style="color: var(--brand-orange);"></i>
+                        </div>
+                        <h5 class="text-white fw-bold">Learn • Play • Code</h5>
+                        <small class="text-white opacity-90">Examfriendly Interactive Learning</small>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4 border-white opacity-20">
+
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-badge h-100">
+                        <div class="fs-4 mb-2 text-warning">🎮</div>
+                        <h6 class="fw-bold mb-1">Learn Through Games</h6>
+                        <small class="opacity-80">Understand coding logic using interactive games and fun challenges.</small>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-badge h-100">
+                        <div class="fs-4 mb-2 text-warning">🧠</div>
+                        <h6 class="fw-bold mb-1">Visualise Before You Code</h6>
+                        <small class="opacity-80">Build a strong foundation by understanding how programming concepts work before writing code.</small>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-badge h-100">
+                        <div class="fs-4 mb-2 text-warning">💻</div>
+                        <h6 class="fw-bold mb-1">Code with Confidence</h6>
+                        <small class="opacity-80">Gradually turn creative ideas into working Python programs through guided practice.</small>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-badge h-100">
+                        <div class="fs-4 mb-2 text-warning">🚀</div>
+                        <h6 class="fw-bold mb-1">Build Amazing Projects</h6>
+                        <small class="opacity-80">Apply newly learned skills to create exciting projects and bring creative ideas to life.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 p-3 rounded-3 bg-black bg-opacity-20 d-flex align-items-center gap-2">
+                <i class="bi bi-stars text-warning fs-4"></i>
+                <small class="mb-0">
+                    <strong>✨ No Prior Coding Experience Required!</strong> We start with the basics and help children progress step by step, developing logical thinking, problem-solving abilities, and creativity along the way. At Examfriendly Kidz Python, children don't just learn to code—they learn to think like programmers!
+                </small>
+            </div>
+        </div>
+
+        <div class="form-card p-4 p-md-5">
+            <form id="registrationForm" class="needs-validation" novalidate>
+                
+                <h5 class="section-header">1. Student Details</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-5">
+                        <label for="firstName" class="form-label fw-semibold">Student's First Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="firstName" placeholder="e.g. Alex" required>
+                        <div class="invalid-feedback">Please enter the student's first name.</div>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="lastName" class="form-label fw-semibold">Student's Last Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="lastName" placeholder="e.g. Smith" required>
+                        <div class="invalid-feedback">Please enter the student's last name.</div>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="studentAge" class="form-label fw-semibold">Age <span class="text-danger">*</span></label>
+                        <select class="form-select" id="studentAge" required>
+                            <option value="" disabled selected>Select</option>
+                            <option value="10">10 yrs</option>
+                            <option value="11">11 yrs</option>
+                            <option value="12">12 yrs</option>
+                            <option value="13">13 yrs</option>
+                            <option value="14">14 yrs</option>
+                            <option value="15">15 yrs</option>
+                        </select>
+                        <div class="invalid-feedback">Select age.</div>
+                    </div>
+                </div>
+
+                <h5 class="section-header">2. Parent / Guardian Contact</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="email" class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bi bi-envelope"></i></span>
+                            <input type="email" class="form-control" id="email" placeholder="parent@example.com" required>
+                            <div class="invalid-feedback">Please provide a valid email address.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="whatsappNumber" class="form-label fw-semibold">WhatsApp Number <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bi bi-whatsapp"></i></span>
+                            <input type="tel" class="form-control" id="whatsappNumber" placeholder="+91 98765 43210" pattern="[0-9+\s\-]{8,15}" required>
+                            <div class="invalid-feedback">Please enter a valid WhatsApp contact number.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="section-header">3. Coding Background</h5>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold d-block">Any Prior Programming Experience? <span class="text-danger">*</span></label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="priorExp" id="expYes" value="Yes" required onchange="toggleExperienceFields(true)">
+                        <label class="form-check-label fw-medium" for="expYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="priorExp" id="expNo" value="No" required onchange="toggleExperienceFields(false)">
+                        <label class="form-check-label fw-medium" for="expNo">No (Complete Beginner)</label>
+                    </div>
+                    <div class="invalid-feedback">Please select whether the student has prior coding experience.</div>
+
+                    <div id="conditionalExperience" class="conditional-box p-3 rounded-3 border" style="background-color: var(--brand-orange-light);">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="whichLanguage" class="form-label fw-semibold">If Yes, Which language?</label>
+                                <input type="text" class="form-control" id="whichLanguage" placeholder="e.g. Scratch, HTML, Python, Block-based">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Rate your experience level:</label>
+                                <div class="star-rating">
+                                    <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 stars"><i class="bi bi-star-fill"></i></label>
+                                    <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 stars"><i class="bi bi-star-fill"></i></label>
+                                    <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 stars"><i class="bi bi-star-fill"></i></label>
+                                    <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 stars"><i class="bi bi-star-fill"></i></label>
+                                    <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 star"><i class="bi bi-star-fill"></i></label>
+                                </div>
+                                <small class="text-muted">1 = Beginner, 5 = Experienced</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="section-header">4. Select Class Slot <span class="text-danger">*</span></h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <input type="radio" class="btn-check" name="classSlot" id="slot1" value="2:30 to 4 PM IST" required>
+                        <label class="slot-card p-3 d-block h-100" for="slot1">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="badge text-white mb-2" style="background-color: var(--brand-blue-dark);">Slot 1</span>
+                                    <h6 class="fw-bold mb-1"><i class="bi bi-clock me-1" style="color: var(--brand-blue);"></i> 2:30 PM – 4:00 PM IST</h6>
+                                    <small class="text-muted">Interactive Live Batch</small>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="radio" class="btn-check" name="classSlot" id="slot2" value="4:30 PM to 6 PM IST" required>
+                        <label class="slot-card p-3 d-block h-100" for="slot2">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="badge text-white mb-2" style="background-color: var(--brand-orange);">Slot 2</span>
+                                    <h6 class="fw-bold mb-1"><i class="bi bi-clock me-1" style="color: var(--brand-orange);"></i> 4:30 PM – 6:00 PM IST</h6>
+                                    <small class="text-muted">Interactive Live Batch</small>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <h5 class="section-header">5. Preferences & Discovery</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-12">
+                        <label for="expectations" class="form-label fw-semibold">What are you expecting from this Course? <span class="text-muted fw-normal">(optional)</span></label>
+                        <textarea class="form-control" id="expectations" rows="3" placeholder="Share any specific goals, questions, or learning interests your child has..."></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="hearAboutUs" class="form-label fw-semibold">How did you hear about us? <span class="text-danger">*</span></label>
+                        <select class="form-select" id="hearAboutUs" required>
+                            <option value="" disabled selected>Select an option</option>
+                            <option value="Social Media (Instagram / Facebook)">Social Media (Instagram / Facebook)</option>
+                            <option value="Friend or Family Recommendation">Friend or Family Recommendation</option>
+                            <option value="Google Search">Google Search</option>
+                            <option value="School / Educational Institution">School / Educational Institution</option>
+                            <option value="WhatsApp Group">WhatsApp Group</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div class="invalid-feedback">Please select how you heard about us.</div>
+                    </div>
+                </div>
+
+                <div class="text-center pt-3">
+                    <button type="submit" id="submitBtn" class="btn btn-submit btn-lg w-100 w-md-auto">
+                        <i class="bi bi-rocket-takeoff-fill me-2 text-warning"></i> Register For Kidz Python
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="text-center mt-4 text-muted small">
+            <p>© Examfriendly • Kidz Python Programming. Empowering young minds through logical thinking and code.</p>
+        </div>
+    </div>
+
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-body text-center p-4 p-md-5">
+                    <div class="mb-3">
+                        <i class="bi bi-check-circle-fill display-1" style="color: var(--brand-orange);"></i>
+                    </div>
+                    <h3 class="fw-bold mb-2" style="color: var(--brand-blue-deep);">Registration Successful! 🎉</h3>
+                    
+                    <div class="p-3 my-3 rounded-3 text-center text-white" style="background: linear-gradient(135deg, var(--brand-blue-deep) 0%, var(--brand-blue-dark) 100%);">
+                        <div class="fs-6 text-warning text-uppercase fw-bold mb-1" style="letter-spacing: 1px;">
+                            <i class="bi bi-calendar-check-fill me-1"></i> Important Note
+                        </div>
+                        <div class="fs-5 fw-extrabold">
+                            Course Starts From <span class="text-warning">25th October</span> 🚀
+                        </div>
+                    </div>
+
+                    <p class="text-muted mb-4">
+                        Thank you for enrolling in <strong>Examfriendly Kidz Python Programming</strong>! We have received your details and will contact you on WhatsApp with the <strong>Demo Class joining link</strong> prior to 25th October.
+                    </p>
+
+                    <div class="p-3 rounded-3 text-start mb-4 fs-6" style="background-color: var(--brand-orange-light); border: 1px solid rgba(255,102,0,0.2);">
+                        <div class="mb-1"><strong>Student:</strong> <span id="summaryName"></span></div>
+                        <div class="mb-1"><strong>Slot Selected:</strong> <span id="summarySlot"></span></div>
+                        <div class="mb-1"><strong>WhatsApp:</strong> <span id="summaryPhone"></span></div>
+                    </div>
+                    <button type="button" class="btn btn-dark btn-lg w-100 rounded-3" data-bs-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // =========================================================================
+        // GOOGLE APPS SCRIPT WEB APP URL:
+        // =========================================================================
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwyOU7LCOJZhvvz9PMl4T3OnDuyRJhEJPgs2GiEZm2LeKlsSAMm3szL9swnO33WBHn5/exec';
+        // =========================================================================
+
+        function toggleExperienceFields(isYes) {
+            const expBox = document.getElementById('conditionalExperience');
+            const langInput = document.getElementById('whichLanguage');
+            
+            if (isYes) {
+                expBox.classList.add('visible');
+            } else {
+                expBox.classList.remove('visible');
+                langInput.value = '';
+                const ratingRadios = document.querySelectorAll('input[name="rating"]');
+                ratingRadios.forEach(r => r.checked = false);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('registrationForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+
+            form.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (form.checkValidity()) {
+                    const firstName = document.getElementById('firstName').value.trim();
+                    const lastName = document.getElementById('lastName').value.trim();
+                    const studentAge = document.getElementById('studentAge').value;
+                    const email = document.getElementById('email').value.trim();
+                    const whatsappNumber = document.getElementById('whatsappNumber').value.trim();
+                    const priorExp = document.querySelector('input[name="priorExp"]:checked')?.value || 'No';
+                    const whichLanguage = document.getElementById('whichLanguage').value.trim();
+                    const rating = document.querySelector('input[name="rating"]:checked')?.value || '';
+                    const classSlot = document.querySelector('input[name="classSlot"]:checked')?.value || '';
+                    const expectations = document.getElementById('expectations').value.trim();
+                    const hearAboutUs = document.getElementById('hearAboutUs').value;
+
+                    const originalBtnText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status"></span> Submitting...`;
+
+                    document.getElementById('summaryName').textContent = `${firstName} ${lastName}`;
+                    document.getElementById('summarySlot').textContent = classSlot;
+                    document.getElementById('summaryPhone').textContent = whatsappNumber;
+
+                    try {
+                        const payload = {
+                            firstName,
+                            lastName,
+                            studentAge,
+                            email,
+                            whatsappNumber,
+                            priorExp,
+                            whichLanguage,
+                            rating,
+                            classSlot,
+                            expectations,
+                            hearAboutUs
+                        };
+
+                        // Convert payload into URL search parameters
+                        const searchParams = new URLSearchParams(payload);
+                        const targetUrl = `${GOOGLE_SCRIPT_URL}?${searchParams.toString()}`;
+
+                        // Send GET request to Apps Script Web App
+                        await fetch(targetUrl, {
+                            method: 'GET',
+                            mode: 'no-cors'
+                        });
+
+                        // Secondary image ping fallback to guarantee delivery in restricted frames
+                        const imgPing = new Image();
+                        imgPing.src = targetUrl;
+                    } catch (error) {
+                        console.log('Google Sheet submission log:', error);
+                    }
+
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+
+                    successModal.show();
+
+                    form.reset();
+                    form.classList.remove('was-validated');
+                    toggleExperienceFields(false);
+                } else {
+                    form.classList.add('was-validated');
+                }
+            }, false);
+        });
+    </script>
+</body>
+</html>
